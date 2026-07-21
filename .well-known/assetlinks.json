@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.islamsabry.knowledgejourney",
+      "sha256_cert_fingerprints": [
+        "58:41:A5:DA:5C:29:C8:48:2F:90:AE:64:DB:89:63:81:E8:07:91:C5:58:0A:CC:E9:A4:48:76:8A:00:3E:AD:8D"
+      ]
+    }
+  }
+]
