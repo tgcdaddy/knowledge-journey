@@ -1,0 +1,30 @@
+{
+  "name": "رحلة المعرفة اليومية",
+  "short_name": "المعرفة",
+  "description": "تطبيق تعليمي يومي شامل للأطفال",
+  "start_url": "/Journey-of-Knowledge-/",
+  "scope": "/Journey-of-Knowledge-/",
+  "display": "standalone",
+  "background_color": "#F6F0DF",
+  "theme_color": "#1F3A3D",
+  "orientation": "portrait-primary",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": [
+    "education"
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
