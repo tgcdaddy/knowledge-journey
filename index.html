@@ -2118,8 +2118,24 @@ function generateCode(deviceId,dateStr,days){
 }
 function checkActiv(){
   const input=(document.getElementById('activInput').value||'').trim().toUpperCase();
+  const msg=document.getElementById('activMsg');
+  /* كود خاص بالمختبرين (Closed Testing) — صالح لغاية تاريخ ثابت بغض النظر عن تاريخ الاستخدام */
+  const TESTER_CODE='RMYTEST26';
+  const TESTER_EXPIRY=new Date('2026-09-15T23:59:59').getTime();
+  if(input===TESTER_CODE){
+    if(Date.now()>TESTER_EXPIRY){
+      if(msg){msg.style.color='var(--coral)';msg.textContent='❌ انتهت صلاحية كود الاختبار';}
+      return;
+    }
+    localStorage.setItem('rmy_premium','true');
+    localStorage.setItem('rmy_expiry',TESTER_EXPIRY.toString());
+    isPremium=true;
+    closeActiv();buildHome();
+    const expiryStr=new Date(TESTER_EXPIRY).toLocaleDateString('ar-EG');
+    setTimeout(()=>showToast('🎉 تم تفعيل نسخة الاختبار! صالحة حتى: '+expiryStr),200);
+    return;
+  }
   if(input.length<7){
-    const msg=document.getElementById('activMsg');
     if(msg){msg.style.color='var(--coral)';msg.textContent='❌ كود خاطئ — تواصل مع المطور';}
     return;
   }
@@ -2128,7 +2144,6 @@ function checkActiv(){
   const daysPart=input.slice(0,3);
   const days=parseInt(daysPart,36);
   const expected=generateCode(deviceId,dateStr,days);
-  const msg=document.getElementById('activMsg');
   if(input===expected){
     const expiry=days>=9999?null:Date.now()+(days*86400000);
     localStorage.setItem('rmy_premium','true');
