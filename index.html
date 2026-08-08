@@ -41,7 +41,9 @@ GOOGLE PLAY GUIDE — خطوات رفع التطبيق على Google Play:
   <meta name="apple-mobile-web-app-title" content="المعرفة اليومية">
   <link rel="manifest" href="manifest.json">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="ar">
 <title>رحلة المعرفة اليومية v2.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;900&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap" rel="stylesheet">
@@ -115,7 +117,7 @@ GOOGLE PLAY GUIDE — خطوات رفع التطبيق على Google Play:
     opacity:0; transform:scale(.5); }
   .card.done .stamp{ opacity:1; transform:scale(1); }
 
-  .quiz-box{ background:var(--paper); border-radius:24px; padding:30px; box-shadow:var(--shadow); border:1px solid var(--line); }
+  .quiz-box{ background:var(--paper); border-radius:24px; padding:30px; box-shadow:var(--shadow); border:1px solid var(--line); max-height:100dvh; overflow-y:auto; }
   .quiz-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;}
   .progress-track{ flex:1; height:8px; background:var(--line); border-radius:99px; margin:0 16px; overflow:hidden;}
   .progress-fill{ height:100%; background:linear-gradient(90deg, var(--gold), var(--coral)); width:0%; transition:width .35s ease;}
@@ -304,6 +306,18 @@ GOOGLE PLAY GUIDE — خطوات رفع التطبيق على Google Play:
   }
 
 
+  /* ── TOAST NOTIFICATION ── */
+  #toastMsg{
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--teal); color:#fff; padding:14px 28px; border-radius:999px;
+    font-family:'Tajawal'; font-size:15px; font-weight:700;
+    box-shadow:0 8px 30px rgba(0,0,0,0.25); z-index:9999;
+    opacity:0; transition:all 0.35s ease; pointer-events:none; white-space:nowrap;
+  }
+  #toastMsg.show{
+    opacity:1; transform:translateX(-50%) translateY(0);
+  }
+
   /* ── SPLASH SCREEN ── */
   #splashScreen{
     position:fixed;inset:0;z-index:9999;
@@ -346,6 +360,8 @@ GOOGLE PLAY GUIDE — خطوات رفع التطبيق على Google Play:
       <div class="btnrow">
         <button class="btn btn-gold" onclick="handleDaily()">🚀 ابدأ امتحان اليوم الشامل</button>
         <button class="btn btn-outline" onclick="scrollToGrid()">تصفح المجالات</button>
+        <button class="btn btn-outline" onclick="startRandQ()" style="margin-top:8px;width:100%;border-color:var(--teal-light);">🧠 اسألني سؤالاً</button>
+        <button class="btn btn-outline" id="familyQBtn" onclick="startFamilyQ()" style="margin-top:8px;width:100%;border-color:var(--gold);position:relative;">👨‍👩‍👧 سؤال العائلة<span id="familyQCheck" style="display:none;position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--green);font-weight:900;">✅</span></button>
         <button class="btn btn-gold" id="premBtn" style="display:none;" onclick="showUpgr()">⭐ اشترك للنسخة الكاملة</button>
         <button class="btn" id="premiumBtn" style="background:var(--gold);color:var(--teal);display:none;"
                 onclick="showUpgrade()">⭐ اشترك للنسخة الكاملة</button>
@@ -391,7 +407,7 @@ GOOGLE PLAY GUIDE — خطوات رفع التطبيق على Google Play:
       <div class="big" id="summaryEmoji">🏆</div>
       <h3 id="summaryTitle">أحسنت!</h3>
       <p id="summaryText"></p>
-      <div class="btnrow" style="justify-content:center; margin-top:18px;">
+      <div id="summaryBtns" class="btnrow" style="flex-direction:column;gap:10px;margin-top:18px;">
         <button class="btn btn-gold" onclick="goHome()">العودة للرئيسية</button>
       </div>
     </div>
@@ -419,18 +435,136 @@ GOOGLE PLAY GUIDE — خطوات رفع التطبيق على Google Play:
     <div class="u-ico">🔒</div>
     <h2>محتوى مميز</h2>
     <ul>
-      <li>✅ 100 سؤال × 8 مجالات كاملة</li>
-      <li>✅ التاريخ المصري — العلوم — الكمبيوتر</li>
-      <li>✅ فوازير وألغاز كاملة</li>
-      <li>✅ 104 مهمة كمبيوتر عملية</li>
+      <li>✅ 100 سؤال × 10 مجالات كاملة</li>
+      <li>✅ التاريخ المصري — العلوم — الكمبيوتر — الجغرافيا</li>
+      <li>✅ فوازير وألغاز — أمان رقمي كاملة</li>
+      <li>✅ 100 مهمة كمبيوتر عملية</li>
       <li>✅ 30 تمرين رياضي</li>
       <li>✅ امتحان يومي شامل</li>
       <li>✅ أسئلة تتجدد في كل جلسة</li>
     </ul>
     <div class="price">$1.99 <span>/ شهر فقط</span></div>
-    <button class="btn btn-gold" style="width:100%;font-size:16px;margin-bottom:10px;"
-            onclick="closeUpgrade()">اشترك الآن ✨</button>
+    <a href="https://ig.me/m/daily.knowledge.journey"
+       target="_blank" rel="noopener"
+       class="btn btn-gold" style="width:100%;font-size:16px;margin-bottom:10px;display:block;text-decoration:none;text-align:center;box-sizing:border-box;"
+       onclick="closeUpgrade()">
+      📩 تواصل معنا للاشتراك
+    </a>
+    <button class="btn btn-teal" style="width:100%;font-size:15px;margin-bottom:10px;"
+            onclick="closeUpgrade();showActiv()">🔑 لدي كود تفعيل</button>
+    <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:10px;"
+            onclick="showHowTo()">❓ كيف أشترك؟</button>
     <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="closeUpgrade()">لاحقاً</button>
+  </div>
+</div>
+
+<!-- HOW TO SUBSCRIBE MODAL -->
+<div class="overlay hidden" id="howToOv" onclick="closeHowTo()">
+  <div class="mc" onclick="event.stopPropagation()" style="max-width:380px;max-height:90vh;overflow-y:auto;">
+    <div style="font-size:40px;margin-bottom:8px;">📋</div>
+    <h2 style="margin:0 0 6px;">كيف أشترك؟</h2>
+    <p style="color:var(--teal-light);font-size:13px;margin:0 0 20px;">اتبع الخطوات للحصول على النسخة الكاملة</p>
+
+    <div style="background:var(--cream);border-radius:16px;padding:16px;margin-bottom:12px;text-align:right;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="background:var(--gold);color:var(--teal);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">١</div>
+        <div style="font-weight:700;color:var(--teal);font-size:15px;">تواصل معنا على إنستاجرام</div>
+      </div>
+      <p style="margin:0;font-size:13px;color:var(--teal-light);line-height:1.8;">اضغط زر <b>"تواصل معنا للاشتراك"</b> وأرسل لنا رسالة.</p>
+      <div style="margin-top:8px;background:var(--paper);border-radius:10px;padding:8px;font-size:13px;color:var(--teal);text-align:center;direction:ltr;">@daily.knowledge.journey</div>
+    </div>
+
+    <div style="background:var(--cream);border-radius:16px;padding:16px;margin-bottom:12px;text-align:right;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="background:var(--gold);color:var(--teal);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">٢</div>
+        <div style="font-weight:700;color:var(--teal);font-size:15px;">أرسل رمز جهازك</div>
+      </div>
+      <p style="margin:0;font-size:13px;color:var(--teal-light);line-height:1.8;">افتح شاشة التفعيل، انسخ <b>رمز جهازك</b> وأرسله لنا.</p>
+      <div style="margin-top:8px;background:var(--paper);border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-size:11px;color:var(--teal-light);margin-bottom:4px;">مثال</div>
+        <div style="font-family:monospace;font-size:20px;font-weight:700;color:var(--teal);letter-spacing:4px;">MS0X80</div>
+      </div>
+    </div>
+
+    <div style="background:var(--cream);border-radius:16px;padding:16px;margin-bottom:12px;text-align:right;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="background:var(--gold);color:var(--teal);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">٣</div>
+        <div style="font-weight:700;color:var(--teal);font-size:15px;">ادفع واستلم كود التفعيل</div>
+      </div>
+      <p style="margin:0;font-size:13px;color:var(--teal-light);line-height:1.8;">سنرسل لك رابط الدفع عبر إنستاجرام (<b>$1.99 / شهر</b>)، وبعد تأكيد الدفع ستستلم <b>كود التفعيل</b> فوراً.</p>
+    </div>
+
+    <div style="background:var(--cream);border-radius:16px;padding:16px;margin-bottom:20px;text-align:right;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="background:var(--green);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">٤</div>
+        <div style="font-weight:700;color:var(--teal);font-size:15px;">فعّل النسخة الكاملة</div>
+      </div>
+      <p style="margin:0;font-size:13px;color:var(--teal-light);line-height:1.8;">الصق الكود في شاشة التفعيل واضغط <b>"تفعيل"</b> 🎉</p>
+    </div>
+
+    <a href="https://ig.me/m/daily.knowledge.journey"
+       target="_blank" rel="noopener"
+       style="display:block;width:100%;margin-bottom:10px;padding:13px;border-radius:14px;
+              background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
+              color:#fff;font-family:'Tajawal';font-weight:700;font-size:15px;
+              text-align:center;text-decoration:none;box-sizing:border-box;">
+      📸 اشترك عبر إنستاجرام
+    </a>
+    <button class="btn btn-teal" style="width:100%;margin-bottom:10px;"
+            onclick="closeHowTo();showActiv()">🔑 لدي كود تفعيل</button>
+    <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="closeHowTo()">إغلاق</button>
+  </div>
+</div>
+
+
+<!-- DID YOU KNOW -->
+<div class="overlay hidden" id="dykOv" style="z-index:800;">
+  <div class="mc" onclick="event.stopPropagation()" style="max-width:360px;text-align:center;">
+    <div style="font-size:48px;margin-bottom:12px;">💡</div>
+    <div style="font-size:13px;color:var(--gold-deep);font-weight:700;margin-bottom:8px;font-family:'Tajawal';">هل تعلم؟</div>
+    <p id="dykText" style="font-size:18px;line-height:1.9;color:var(--teal);font-family:'Tajawal';font-weight:700;margin:0 0 20px;"></p>
+    <button class="btn btn-gold" style="width:100%;" onclick="closeDyk()">متابعة ▶</button>
+  </div>
+</div>
+
+<!-- RANDOM Q MODAL -->
+<div class="overlay hidden" id="randQOv" onclick="event.stopPropagation()">
+  <div class="mc" onclick="event.stopPropagation()" style="max-width:420px;">
+    <div style="font-size:11px;color:var(--teal-light);margin-bottom:6px;font-family:'Tajawal';">🧠 سؤال عشوائي</div>
+    <p id="randQText" style="font-size:16px;font-weight:700;color:var(--teal);line-height:1.7;margin:0 0 14px;font-family:'Tajawal';"></p>
+    <div id="randQOpts" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+    <div id="randQFill" style="display:none;margin-bottom:14px;">
+      <input id="randQInput" type="text" placeholder="اكتب إجابتك..." 
+             style="width:100%;padding:12px;border:2px solid var(--line);border-radius:12px;font-family:'Tajawal';font-size:15px;text-align:right;box-sizing:border-box;background:var(--cream);">
+      <button class="btn btn-teal" style="width:100%;margin-top:8px;" onclick="checkRandQ()">✅ تحقق</button>
+    </div>
+    <div id="randQFeedback" style="min-height:24px;font-size:14px;font-weight:700;text-align:center;margin-bottom:12px;font-family:'Tajawal';"></div>
+    <button id="randQNextBtn" class="btn btn-ghost btn-sm" style="width:100%;display:none;" onclick="closeRandQ()">العودة للرئيسية</button>
+  </div>
+</div>
+
+
+<!-- FAMILY QUESTION -->
+<div class="overlay hidden" id="familyQOv" onclick="event.stopPropagation()">
+  <div class="mc" onclick="event.stopPropagation()" style="max-width:400px;text-align:center;">
+    <div style="font-size:48px;margin-bottom:10px;">👨‍👩‍👧</div>
+    <h2 style="margin:0 0 16px;">سؤال العائلة</h2>
+    <div style="background:var(--cream);border-radius:16px;padding:18px;margin-bottom:14px;">
+      <p id="familyQText" style="margin:0;font-size:16px;line-height:1.9;color:var(--teal);font-weight:700;font-family:'Tajawal';"></p>
+    </div>
+    <p style="font-size:12px;color:var(--teal-light);margin:0 0 20px;font-family:'Tajawal';">💡 سؤال واحد فقط في اليوم — عُد غداً لسؤال عائلي جديد!</p>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:10px;" onclick="doneFamilyQ()">✅ تم تنفيذ المهمة</button>
+    <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="closeFamilyQ()">↩ العودة</button>
+  </div>
+</div>
+
+<!-- FAMILY Q SUCCESS -->
+<div class="overlay hidden" id="familyQSuccessOv" onclick="event.stopPropagation()">
+  <div class="mc" onclick="event.stopPropagation()" style="max-width:360px;text-align:center;">
+    <div style="font-size:52px;margin-bottom:10px;">🎉</div>
+    <h2 style="margin:0 0 12px;">رائع!</h2>
+    <p style="font-size:15px;color:var(--teal-light);line-height:1.8;margin:0 0 20px;font-family:'Tajawal';">قضاء وقت مع العائلة جزء مهم من رحلة المعرفة.</p>
+    <button class="btn btn-gold" style="width:100%;" onclick="closeFamilyQSuccess()">العودة للرئيسية</button>
   </div>
 </div>
 
@@ -492,9 +626,18 @@ GOOGLE PLAY GUIDE — خطوات رفع التطبيق على Google Play:
       <div style="font-size:11px;color:var(--teal-light);margin-bottom:4px;">رمز جهازك</div>
       <div id="deviceCode" style="font-family:monospace;font-size:22px;font-weight:700;color:var(--teal);letter-spacing:4px;">----</div>
     </div>
-    <button class="btn btn-teal" style="width:100%;margin-bottom:16px;font-size:14px;" onclick="copyDeviceCode()">
+    <button class="btn btn-teal" style="width:100%;margin-bottom:8px;font-size:14px;" onclick="copyDeviceCode()">
       📋 نسخ رمز الجهاز
     </button>
+    <a href="https://ig.me/m/daily.knowledge.journey"
+       target="_blank" rel="noopener"
+       onclick="copyDeviceMessage()"
+       style="display:block;width:100%;margin-bottom:16px;padding:11px;border-radius:14px;
+              background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
+              color:#fff;font-family:'Tajawal';font-weight:700;font-size:14px;
+              text-align:center;text-decoration:none;box-sizing:border-box;">
+      📸 أرسل الرمز عبر إنستاجرام
+    </a>
 
     <!-- Step 2: Activation code -->
     <p style="color:var(--teal-light);font-size:13px;margin:0 0 8px;">
@@ -542,9 +685,16 @@ GOOGLE PLAY GUIDE — خطوات رفع التطبيق على Google Play:
     <div id="clist" style="margin-bottom:10px;max-height:320px;overflow-y:auto;"></div>
     <button class="btn btn-gold" style="width:100%;"
       onclick="document.getElementById('cselOv').classList.add('hidden');showNInput()">+ لاعب جديد</button>
+    <div id="dykInCsel" style="margin-top:14px;background:var(--cream);border-radius:14px;padding:12px;text-align:right;display:none;">
+      <div style="font-size:14px;color:var(--gold-deep);font-weight:900;margin-bottom:8px;font-family:'Tajawal';">💡 هل تعلم؟</div>
+      <p id="dykInCselText" style="margin:0;font-size:17px;color:var(--teal);line-height:1.9;font-family:'Tajawal';font-weight:700;"></p>
+    </div>
   </div>
 </div>
 
+
+<!-- TOAST -->
+<div id="toastMsg"></div>
 
 <!-- CONFIRM DELETE -->
 <div class="overlay hidden" id="confirmOv" onclick="closeConfirm()" style="z-index:3000;">
@@ -607,16 +757,22 @@ GOOGLE PLAY GUIDE — خطوات رفع التطبيق على Google Play:
     <div class="mi">🔒</div>
     <h2>محتوى مميز</h2>
     <ul>
-      <li>✅ جميع المجالات — 860 سؤال</li>
-      <li>✅ العلوم — الفوازير — الكمبيوتر</li>
-      <li>✅ 104 مهمة كمبيوتر عملية</li>
+      <li>✅ جميع المجالات — 1000 سؤال</li>
+      <li>✅ العلوم — الفوازير — الكمبيوتر — الجغرافيا</li>
+      <li>✅ 100 مهمة كمبيوتر عملية</li>
       <li>✅ 30 تمرين رياضي كامل</li>
       <li>✅ امتحان يومي شامل</li>
       <li>✅ أسئلة تتجدد في كل جلسة</li>
     </ul>
     <div class="ptag">$1.99 <span>/ شهر فقط</span></div>
-    <button class="btn btn-gold" style="width:100%;font-size:16px;margin-bottom:8px;" onclick="closeUpgr()">اشترك الآن ✨</button>
+    <a href="https://ig.me/m/daily.knowledge.journey"
+       target="_blank" rel="noopener"
+       style="display:block;width:100%;margin-bottom:8px;padding:13px;border-radius:14px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;font-family:'Tajawal';font-weight:700;font-size:15px;text-align:center;text-decoration:none;box-sizing:border-box;"
+       onclick="closeUpgr()">
+      📩 تواصل معنا للاشتراك
+    </a>
     <button class="btn btn-teal" style="width:100%;margin-bottom:8px;" onclick="closeUpgr();showActiv()">🔑 لدي كود تفعيل</button>
+    <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:8px;" onclick="showHowTo()">❓ كيف أشترك؟</button>
     <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="closeUpgr()">لاحقاً</button>
   </div>
 </div>
@@ -636,7 +792,7 @@ GOOGLE PLAY GUIDE — خطوات رفع التطبيق على Google Play:
 const CATS = [
 {id:'islam', name:'الدين الإسلامي', icon:'🕌', q:[
 {type:'mcq', q:'كم عدد أركان الإسلام؟', opts:['ثلاثة','أربعة','خمسة','ستة'], a:2},
-{type:'mcq', q:'في أي شهر فُرض صيام رمضان؟', opts:['السنة الأولى للهجرة','السنة الثانية للهجرة','السنة الثالثة للهجرة','قبل الهجرة'], a:1},
+{type:'mcq', q:'في أي سنة هجرية فُرض صيام رمضان؟', opts:['السنة الأولى للهجرة','السنة الثانية للهجرة','السنة الثالثة للهجرة','قبل الهجرة'], a:1},
 {type:'mcq', q:'من هو خاتم الأنبياء والمرسلين؟', opts:['عيسى عليه السلام','موسى عليه السلام','محمد ﷺ','إبراهيم عليه السلام'], a:2},
 {type:'fill', q:'أكمل: "إنما الأعمال بـ ......."', accept:['النيات','بالنيات']},
 {type:'mcq', q:'كم عدد سور القرآن الكريم؟', opts:['100','114','120','99'], a:1},
@@ -660,8 +816,8 @@ const CATS = [
 {type:'mcq', q:'كم عدد الأنبياء المذكورين في القرآن الكريم تقريبًا؟', opts:['15','25','35','50'], a:1},
 {type:'mcq', q:'من النبي الذي ابتلعه الحوت؟', opts:['يونس عليه السلام','يوسف عليه السلام','يعقوب عليه السلام','نوح عليه السلام'], a:0},
 {type:'mcq', q:'ما اسم السورة التي تسمى "قلب القرآن"؟', opts:['البقرة','يس','الكهف','الرحمن'], a:1},
-{type:'mcq', q:'كم عدد أيام شهر رمضان عادة؟', opts:['28 أو 29','29 أو 30','30 أو 31','31 يوم ثابت'], a:1},
-{type:'fill', q:'ما اسم صلاة الجماعة الأسبوعية يوم الجمعة؟', accept:['الجمعة','صلاة الجمعة']},
+{type:'mcq', q:'كم عدد أيام شهر رمضان عادة؟', opts:['28 أو 29','29 أو 30','25 أو 26','32 أو 33'], a:1},
+{type:'fill', q:'ما اسم صلاة الجماعة الأسبوعية التي تُصلى ظهراً وتسبقها خطبة؟', accept:['الجمعة','صلاة الجمعة']},
 {type:'mcq', q:'من النبي الذي بنى السفينة بأمر الله؟', opts:['نوح عليه السلام','إبراهيم عليه السلام','يونس عليه السلام','صالح عليه السلام'], a:0},
 {type:'mcq', q:'ما هي الزكاة؟', opts:['صلاة يومية','جزء من المال يُعطى للفقراء','صيام شهر','حج البيت'], a:1},
 {type:'mcq', q:'من النبي الملقب بـ"خليل الله"؟', opts:['موسى عليه السلام','إبراهيم عليه السلام','عيسى عليه السلام','آدم عليه السلام'], a:1},
@@ -685,12 +841,12 @@ const CATS = [
 {type:'mcq', q:'من الخليفة الراشد الذي جُمع القرآن في عهده في مصحف واحد؟', opts:['أبو بكر الصديق','عمر بن الخطاب','عثمان بن عفان','علي بن أبي طالب'], a:0},
 {type:'mcq', q:'من الخليفة الذي وحّد المصاحف على قراءة واحدة؟', opts:['أبو بكر الصديق','عمر بن الخطاب','عثمان بن عفان','علي بن أبي طالب'], a:2},
 {type:'mcq', q:'ما اسم زوجة النبي ﷺ التي رافقته في الهجرة وروت أحاديث كثيرة؟', opts:['خديجة','عائشة','حفصة','أم سلمة'], a:1},
-{type:'mcq', q:'كم عدد العشرة المبشرين بالجنة؟', opts:['ثمانية','تسعة','عشرة','اثنا عشر'], a:2},
+{type:'mcq', q:'كم عدد الصحابة المبشرين بالجنة في حديث واحد؟', opts:['ثمانية','تسعة','عشرة','اثنا عشر'], a:2},
 
-{type:'mcq', q:'ما اسم ليلة القدر ومتى تكون تقريبًا؟', opts:['في أول رمضان','في العشر الأواخر من رمضان','في شهر شوال','في ذي الحجة'], a:1},
+{type:'mcq', q:'متى تكون ليلة القدر تقريباً؟', opts:['في أول رمضان','في العشر الأواخر من رمضان','في شهر شوال','في ذي الحجة'], a:1},
 {type:'mcq', q:'من أول امرأة أسلمت في الإسلام؟', opts:['فاطمة الزهراء','عائشة','خديجة بنت خويلد','أسماء بنت أبي بكر'], a:2},
 {type:'fill', q:'ما اسم أول شهر في التقويم الهجري؟', accept:['محرم']},
-{type:'mcq', q:'ما الفرق بين الزكاة والصدقة؟', opts:['لا فرق بينهما','الزكاة فريضة محددة والصدقة تطوعية','الصدقة فريضة والزكاة تطوع','الزكاة للفقراء فقط والصدقة للأغنياء'], a:1},
+{type:'mcq', q:'ما الفرق بين الزكاة والصدقة؟', opts:['لا فرق بينهما','الزكاة فريضة محددة والصدقة تطوعية','كلاهما تطوعي غير محدد','الزكاة للفقراء فقط والصدقة للأغنياء'], a:1},
 {type:'mcq', q:'من الصحابي الملقب بـ"سيف الله المسلول"؟', opts:['علي بن أبي طالب','خالد بن الوليد','عمرو بن العاص','سعد بن أبي وقاص'], a:1},
 {type:'mcq', q:'ما اسم أم المؤمنين المعروفة بـ"الحميراء"؟', opts:['خديجة','عائشة','حفصة','أم سلمة'], a:1},
 {type:'mcq', q:'كم عدد ركعات صلاة الفجر؟', opts:['ركعة واحدة','ركعتان','ثلاث ركعات','أربع ركعات'], a:1},
@@ -708,27 +864,27 @@ const CATS = [
 {type:'mcq', q:'ما اسم الشعيرة التي يُقبّل فيها الحجاج الحجر الأسود؟', opts:['السعي','الطواف','الوقوف بعرفة','رمي الجمرات'], a:1},
 {type:'mcq', q:'من الصحابي المشهور بحفظه للأحاديث النبوية وروايتها؟', opts:['عمر بن الخطاب','أبو هريرة','ابن عباس','أبو ذر الغفاري'], a:1},
 {type:'mcq', q:'ما اسم الدعاء الذي يُقال عند بدء أي عمل؟', opts:['الحمد لله','بسم الله','لا إله إلا الله','سبحان الله'], a:1},
-{type:'fill', q:'ما اسم صيام يوم الاثنين والخميس نوعه؟', accept:['صيام نافلة','سنة','نافلة']},
+{type:'mcq', q:'ما نوع صيام يومي الاثنين والخميس في السنة النبوية؟', opts:['فريضة واجبة','نافلة (سنة)','كفارة عن ذنب','صيام قضاء'], a:1},
 {type:'mcq', q:'ما اسم الكتاب الذي جمع أصح الأحاديث النبوية وصنّفه الإمام البخاري؟', opts:['صحيح مسلم','صحيح البخاري','سنن أبي داود','موطأ مالك'], a:1},
 {type:'mcq', q:'ما اسم الركن الخامس من أركان الإسلام؟', opts:['الزكاة','الصوم','الصلاة','الحج'], a:3},
 {type:'mcq', q:'من النبي الذي أُوتي ملكًا لا ينبغي لأحد من بعده وسخّر الله له الريح والجن؟', opts:['داود عليه السلام','سليمان عليه السلام','إبراهيم عليه السلام','يوسف عليه السلام'], a:1},
-{type:'mcq', q:'ما الحكمة من فريضة الصيام؟', opts:['فقط الجوع والعطش','التقوى وتزكية النفس','العقوبة على الذنوب','الرياضة البدنية'], a:1},
+{type:'mcq', q:'ما الحكمة من فريضة الصيام؟', opts:['إنقاص الوزن فقط','التقوى وتزكية النفس','إراحة المعدة من الطعام','اتباع عادة موسمية'], a:1},
 {type:'mcq', q:'كم عدد ركعات صلاة المغرب؟', opts:['ركعتان','ثلاث ركعات','أربع ركعات','خمس ركعات'], a:1},
 {type:'mcq', q:'ما اسم أول سورة مدنية في ترتيب النزول؟', opts:['البقرة','آل عمران','النساء','المائدة'], a:0},
 {type:'mcq', q:'ما اسم معركة الخندق بالاسم الآخر؟', opts:['غزوة بدر الكبرى','غزوة الأحزاب','غزوة حنين','غزوة تبوك'], a:1},
 {type:'mcq', q:'ما اسم أصحاب النبي ﷺ الذين هاجروا من مكة إلى المدينة؟', opts:['الأنصار','المهاجرون','الصحابة فقط','التابعون'], a:1},
 
-{type:'mcq', q:'ما المقصود بـ "أصحاب الأخدود" في القرآن الكريم؟', opts:['قوم حفروا أخدودًا وعذّبوا المؤمنين بالنار','قوم عاشوا في أخاديد الجبال','قوم كانوا يبنون الخنادق','قوم استعملوا الأخاديد في الزراعة'], a:0},
+{type:'mcq', q:'ما المقصود بـ "أصحاب الأخدود" في القرآن الكريم؟', opts:['قوم حفروا أخدودًا وعذّبوا المؤمنين بالنار','قوم من الأنبياء السابقين','قوم عبدوا الأصنام في مكة','قوم من أصحاب النبي ﷺ'], a:0},
 {type:'mcq', q:'ما اسم النبي الذي أُلقي في البئر من قِبل إخوته؟', opts:['موسى عليه السلام','إسماعيل عليه السلام','يوسف عليه السلام','إسحاق عليه السلام'], a:2},
-{type:'mcq', q:'ما اسم غزوة خرج فيها النبي ﷺ لملاقاة قريش قبل بدر؟', opts:['بواط','ودّان','ذات العشيرة','كل ما سبق صحيح'], a:3},
-{type:'mcq', q:'ما أول واجب على المكلّف؟', opts:['الصلاة','معرفة الله والشهادة','الزكاة','الصوم'], a:1},
+{type:'mcq', q:'ما اسم أعظم غزوة انتصر فيها المسلمون رغم قلة عددهم؟', opts:['غزوة بدر','غزوة أحد','غزوة الخندق','غزوة حنين'], a:0},
+{type:'mcq', q:'ما أول ما يجب على المسلم الجديد أن ينطق به ليدخل الإسلام؟', opts:['الصلاة','الشهادتان','الزكاة','الصوم'], a:1},
 {type:'mcq', q:'ما اسم سورة القرآن التي تُعادل ثلث القرآن؟', opts:['الفاتحة','الكهف','الإخلاص','يس'], a:2},
 {type:'mcq', q:'من الصحابي الذي لُقِّب بـ"حواري النبي ﷺ"؟', opts:['عمر بن الخطاب','الزبير بن العوام','طلحة بن عبيد الله','سعد بن أبي وقاص'], a:1},
 {type:'mcq', q:'ما اسم السورة التي يُقال لها "سنام القرآن"؟', opts:['الفاتحة','البقرة','آل عمران','يس'], a:1},
-{type:'mcq', q:'في كم يوم خُلقت السماوات والأرض؟', opts:['أربعة','خمسة','ستة','سبعة'], a:2},
-{type:'mcq', q:'ما اسم صحابي النبي ﷺ المشهور بطول قامته؟', opts:['عبدالله بن مسعود','خباب بن الأرت','سلمان الفارسي','المقداد بن الأسود'], a:0},
-{type:'fill', q:'ما اسم أول شهيد في الإسلام (من النساء)؟', accept:['سمية بنت خياط','سمية']},
-{type:'mcq', q:'ما هي الأيام البيض؟', opts:['أيام عطلة الأسبوع','اليوم 13 و14 و15 من كل شهر هجري','أول أيام العيد','أيام رمضان كلها'], a:1},
+{type:'mcq', q:'ما اليوم الذي خلق الله فيه آدم عليه السلام؟', opts:['يوم الجمعة','يوم السبت','يوم الأحد','يوم الاثنين'], a:0},
+{type:'mcq', q:'من الصحابي الملقب بـ"ترجمان القرآن" لعلمه بتفسيره؟', opts:['عبدالله بن مسعود','عبدالله بن عباس','سلمان الفارسي','المقداد بن الأسود'], a:1},
+{type:'fill', q:'ما اسم أول امرأة نالت شرف الشهادة في سبيل الإسلام؟', accept:['سمية بنت خياط','سمية']},
+{type:'mcq', q:'ما هي الأيام البيض؟', opts:['أول ثلاثة أيام من كل شهر','اليوم 13 و14 و15 من كل شهر هجري','آخر ثلاثة أيام من كل شهر','أيام الجمعة فقط'], a:1},
 {type:'mcq', q:'ما اسم آخر غزوة شارك فيها النبي ﷺ؟', opts:['تبوك','حنين','خيبر','مؤتة'], a:0},
 {type:'mcq', q:'ما اسم اليوم الذي يقف فيه الحجاج بجبل عرفة؟', opts:['اليوم الثامن من ذي الحجة','التاسع من ذي الحجة','العاشر من ذي الحجة','الحادي عشر من ذي الحجة'], a:1},
 {type:'mcq', q:'من النبي الذي كُلّمه الله بدون وسيط؟', opts:['محمد ﷺ فقط','موسى عليه السلام','إبراهيم عليه السلام','عيسى عليه السلام'], a:1},
@@ -736,7 +892,7 @@ const CATS = [
 {type:'mcq', q:'كم عدد سور القرآن المبدوءة بـ"قل"؟', opts:['سورتان','ثلاث سور','أربع سور','خمس سور'], a:2},
 {type:'fill', q:'ما اسم الصحابي الذي كان يُعلّم أهل المدينة الإسلام قبل الهجرة؟', accept:['مصعب بن عمير']},
 {type:'mcq', q:'ما المقصود بـ"الإسراء"؟', opts:['رحلة ليلية من المدينة إلى مكة','رحلة ليلية من مكة إلى القدس','الصعود إلى السماء','هجرة النبي ﷺ'], a:1},
-{type:'mcq', q:'ما المقصود بـ"المعراج"؟', opts:['رحلة ليلية من مكة إلى القدس','الصعود من القدس إلى السماوات','هجرة النبي إلى المدينة','نزول الوحي'], a:1},
+{type:'mcq', q:'ماذا حدث للنبي ﷺ في رحلة المعراج؟', opts:['زيارة المسجد الأقصى','الصعود إلى السماوات ولقاء الأنبياء','الهجرة إلى المدينة','نزول الوحي لأول مرة'], a:1},
 {type:'mcq', q:'ما اسم الصحيحين اللذين يُعدّان أصح كتب الحديث؟', opts:['سنن النسائي وأبي داود','صحيح البخاري وصحيح مسلم','موطأ مالك وسنن الترمذي','مسند أحمد وسنن ابن ماجه'], a:1},
 ]},
 {id:'history', name:'التاريخ المصري', icon:'🏺', q:[
@@ -753,8 +909,8 @@ const CATS = [
 {type:'mcq', q:'من الملك الذي وحّد مصر العليا والسفلى؟', opts:['نارمر','خوفو','رمسيس الثاني','توت عنخ آمون'], a:0},
 {type:'mcq', q:'ما اسم الملك الفرعوني الذي اشتُهر بمقبرته الذهبية المكتشفة كاملة؟', opts:['رمسيس الثاني','توت عنخ آمون','أخناتون','سيتي الأول'], a:1},
 {type:'mcq', q:'في أي معركة انتصر المصريون والعرب على المغول؟', opts:['عين جالوت','حطين','اليرموك','بدر'], a:0},
-{type:'mcq', q:'من القائد الذي حرر مصر من الحملة الفرنسية فكريًا وأسس الدولة الحديثة؟', opts:['أحمد عرابي','محمد علي باشا','سعد زغلول','عمر مكرم'], a:1},
-{type:'fill', q:'ما اسم العالمة المصرية التي اخترعت تمثال أبو الهول يُنسب لمن؟ (اكتب اسم الملك المرتبط به)', accept:['خفرع']},
+{type:'mcq', q:'من الزعيم الشعبي الذي قاد المصريين لمقاومة الحملة الفرنسية ورفض التعاون معها؟', opts:['أحمد عرابي','محمد علي باشا','سعد زغلول','عمر مكرم'], a:3},
+{type:'fill', q:'من الملكة المصرية القديمة التي بنى معبدها الجنائزي الشهير في الدير البحري واتخذت لقب فرعون؟', accept:['حتشبسوت']},
 {type:'mcq', q:'متى وقعت حرب أكتوبر (تحرير سيناء)؟', opts:['1967','1973','1979','1956'], a:1},
 {type:'mcq', q:'من الرئيس المصري الذي وقّع معاهدة السلام مع إسرائيل عام 1979؟', opts:['جمال عبدالناصر','أنور السادات','حسني مبارك','محمد نجيب'], a:1},
 {type:'mcq', q:'ما اسم أول رئيس لجمهورية مصر؟', opts:['جمال عبدالناصر','محمد نجيب','أنور السادات','فاروق الأول'], a:1},
@@ -788,7 +944,7 @@ const CATS = [
 {type:'mcq', q:'من الزعيم المصري الذي قاد ثورة 1952 وأصبح رئيسًا لاحقًا؟', opts:['محمد نجيب','جمال عبدالناصر','أنور السادات','حسني مبارك'], a:1},
 {type:'mcq', q:'ما اسم الكتاب الذي يحوي أقدم نص قانوني معروف من مصر القديمة يخص الأخلاق؟', opts:['كتاب الموتى','نصائح بتاح حتب','بردية أبرس','نصوص الأهرام'], a:1},
 {type:'mcq', q:'ما اسم الكتابة الجنائزية المصورة على جدران المقابر لمساعدة الميت في الآخرة؟', opts:['كتاب الموتى','الزبور','حجر رشيد','بردية حورس'], a:0},
-{type:'mcq', q:'في أي قرن عاش الفنان والمهندس إمحوتب الذي صمم هرم زوسر المدرج؟', opts:['القرن الثالث قبل الميلاد','القرن السابع والعشرين قبل الميلاد','القرن الأول الميلادي','القرن العاشر قبل الميلاد'], a:1},
+{type:'mcq', q:'من المهندس المصري القديم الذي صمم هرم زوسر المدرّج، أول هرم في التاريخ؟', opts:['إمحوتب','خوفو','إخناتون','حور محب'], a:0},
 {type:'mcq', q:'ما اسم العاصمة التي بناها أخناتون لعبادة إله الشمس آتون؟', opts:['تل العمارنة','طيبة','منف','تانيس'], a:0},
 {type:'mcq', q:'من الملكة المصرية القديمة التي اشتهرت بجمالها وتمثالها الموجود في برلين؟', opts:['نفرتيتي','حتشبسوت','كليوباترا','تي'], a:0},
 
@@ -803,9 +959,9 @@ const CATS = [
 {type:'mcq', q:'ما اسم المعركة التي انتصر فيها صلاح الدين الأيوبي على الصليبيين وحرر بها القدس؟', opts:['معركة عين جالوت','معركة حطين','معركة المنصورة','معركة اليرموك'], a:1},
 {type:'mcq', q:'ما اسم الحملة الأوروبية التي احتلت مصر عام 1798؟', opts:['الحملة الصليبية','الحملة الفرنسية','الحملة البريطانية','الحملة العثمانية'], a:1},
 {type:'fill', q:'ما اسم معركة 1973 التي استردت فيها مصر سيناء؟', accept:['حرب أكتوبر','حرب العاشر من رمضان','حرب تشرين']},
-{type:'mcq', q:'من القائد الذي حرر مصر من الحملة الفرنسية عام 1801؟', opts:['محمد علي باشا','يوسف ضيا باشا','عمر مكرم','مراد بك'], a:0},
+{type:'mcq', q:'من القائد الذي أسّس مصر الحديثة بعد خروج الحملة الفرنسية عام 1805؟', opts:['محمد علي باشا','يوسف ضيا باشا','عمر مكرم','مراد بك'], a:0},
 {type:'mcq', q:'ما اسم المشروع الذي أسسه محمد علي لتحديث الجيش المصري؟', opts:['النظام الجديد','الخط الحميدي','الإصلاح العسكري','التجنيد الإلزامي'], a:0},
-{type:'mcq', q:'في أي عقد من القرن العشرين حفر المصريون القدماء تمثال أبوسمبل وأعادوا نقله لإنقاذه؟', opts:['الخمسينيات','الستينيات','السبعينيات','الثمانينيات'], a:1},
+{type:'mcq', q:'ما اسم تمثالي أبو سمبل الضخمين اللذين نحتهما رمسيس الثاني في أسوان؟', opts:['تمثالا أبو سمبل','تمثالا ممنون','تماثيل الكرنك','تماثيل أبو الهول'], a:0},
 {type:'mcq', q:'ما اسم أول امرأة حكمت مصر من الأسرة الحاكمة الإسلامية في العصر الوسيط؟', opts:['نفرتيتي','شجرة الدر','كليوباترا','حتشبسوت'], a:1},
 {type:'mcq', q:'ما اسم الحرب التي أعلن فيها جمال عبدالناصر تأميم قناة السويس؟', opts:['حرب 1948','العدوان الثلاثي 1956','حرب 1967','حرب 1973'], a:1},
 {type:'mcq', q:'من أنشأ المدرسة المصرية الحديثة وأرسل البعثات للخارج لأول مرة؟', opts:['سعد زغلول','محمد علي باشا','إسماعيل باشا','الخديوي توفيق'], a:1},
@@ -833,23 +989,23 @@ const CATS = [
 {type:'mcq', q:'ما اسم المعاهدة التي وقّعتها مصر مع بريطانيا عام 1936 للاستقلال النسبي؟', opts:['معاهدة لوزان','معاهدة 1936','بروتوكول الإسكندرية','معاهدة كامب ديفيد'], a:1},
 {type:'mcq', q:'في أي عهد أُسِّست جامعة القاهرة عام 1908؟', opts:['محمد علي','إسماعيل باشا','الخديوي عباس حلمي الثاني','الملك فؤاد'], a:2},
 {type:'mcq', q:'ما اسم المفكر الديني الذي أصلح الأزهر وجدّد الفكر الإسلامي في أواخر القرن 19؟', opts:['سعد زغلول','الشيخ محمد عبده','رفاعة الطهطاوي','جمال الدين الأفغاني'], a:1},
-{type:'mcq', q:'ما اسم آخر فرعون مصري قبل الفتح المقدوني؟', opts:['نختانبو الثاني','أمازيس الثاني','بسماتيك الثالث','نكتانبو الأول'], a:0},
+{type:'mcq', q:'من القائد المقدوني الذي أنهى حكم الفراعنة وفتح مصر؟', opts:['يوليوس قيصر','الإسكندر الأكبر','بطليموس الأول','نابليون'], a:1},
 {type:'mcq', q:'في أي عصر حكم الهكسوس مصر؟', opts:['الدولة القديمة','الدولة الوسطى','الفترة بين الدولتين الوسطى والحديثة','الدولة الحديثة'], a:2},
 {type:'mcq', q:'من القائد المصري الذي طرد الهكسوس من مصر وأسّس الدولة الحديثة؟', opts:['أحمس الأول','تحتمس الأول','رمسيس الثاني','سيتي الأول'], a:0},
-{type:'mcq', q:'ما اسم الحرف المصري القديم الذي استُخدم في الأعمال اليومية والورقية؟', opts:['الهيروغليفي','الديموطيقي','القبطي','الهيراطيقي'], a:3},
+{type:'mcq', q:'ما اسم الكتابة المصرية القديمة المكوّنة من رموز وصور؟', opts:['الهيروغليفية','القبطية','العربية','الفينيقية'], a:0},
 {type:'mcq', q:'من الرئيس المصري الذي أعلن التأميم عام 1961 لقطاعات كبيرة من الاقتصاد؟', opts:['محمد نجيب','أنور السادات','جمال عبدالناصر','حسني مبارك'], a:2},
 {type:'mcq', q:'ما اسم عائلة التماثيل الضخمة المنحوتة في الصخر التي أمر ببنائها رمسيس الثاني؟', opts:['تماثيل ممنون','تماثيل أبو سمبل','تماثيل الكرنك','تماثيل أبو الهول'], a:1},
-{type:'mcq', q:'في أي مدينة مصرية وُجد مركز تجارة البهارات في العصور الوسطى؟', opts:['القاهرة','الإسكندرية','دمياط','الفسطاط'], a:1},
+{type:'mcq', q:'ما اسم المدينة المصرية التي كانت ميناءً مهماً وعاصمة إسلامية قبل القاهرة؟', opts:['الفسطاط','دمياط','رشيد','بورسعيد'], a:0},
 {type:'mcq', q:'من الشاعر المصري الذي كتب "النيل نجاشي" و"على ضفاف النيل"؟', opts:['أحمد شوقي','حافظ إبراهيم','بيرم التونسي','صلاح جاهين'], a:0},
 {type:'mcq', q:'من "شاعر النيل" لقب رسمي لأحد شعراء مصر؟', opts:['أحمد شوقي','حافظ إبراهيم','بدر شاكر السياب','محمود درويش'], a:1},
 {type:'mcq', q:'ما اسم المدينة المصرية التي كانت تُسمى قديمًا "منف" وكانت عاصمة الدولة القديمة؟', opts:['الجيزة','سقارة','القاهرة','منطقة ميت رهينة'], a:3},
 ]},
 {id:'arabic', name:'اللغة العربية', icon:'📖', q:[
 {type:'mcq', q:'مرادف كلمة "سَعيد"؟', opts:['حزين','فرحان','غاضب','خائف'], a:1},
-{type:'mcq', q:'ما إعراب الفاعل في الجملة؟', opts:['منصوب','مجرور','مرفوع','مجزوم'], a:2},
+{type:'mcq', q:'ما علامة إعراب الفاعل؟', opts:['منصوب','مجرور','مرفوع','مجزوم'], a:2},
 {type:'mcq', q:'مرادف كلمة "جميل"؟', opts:['قبيح','حسن','بعيد','صغير'], a:1},
 {type:'fill', q:'اكتب ضد كلمة "كبير"', accept:['صغير']},
-{type:'mcq', q:'"المعلمُ يشرحُ الدرسَ" - ما نوع الجملة؟', opts:['اسمية','فعلية'], a:1},
+{type:'mcq', q:'"المعلمُ يشرحُ الدرسَ" - ما نوع الجملة؟', opts:['اسمية','فعلية','جملة شرط','جملة استفهام'], a:1},
 {type:'mcq', q:'علامة رفع الاسم المفرد؟', opts:['الضمة','الفتحة','الكسرة','السكون'], a:0},
 {type:'mcq', q:'مرادف كلمة "سريع"؟', opts:['بطيء','عجول','هادئ','ثقيل'], a:1},
 {type:'mcq', q:'الفعل المضارع من "كتب" هو؟', opts:['كَتَبَ','يكتُب','اُكتُب','كاتب'], a:1},
@@ -879,11 +1035,11 @@ const CATS = [
 {type:'mcq', q:'مرادف كلمة "العَدْل"؟', opts:['الظلم','الإنصاف','القسوة','التحيز'], a:1},
 {type:'mcq', q:'ضد كلمة "الصدق"؟', opts:['الأمانة','الكذب','الوفاء','الإخلاص'], a:1},
 {type:'mcq', q:'مرادف كلمة "الأمل"؟', opts:['اليأس','الرجاء','الحزن','الخوف'], a:1},
-{type:'mcq', q:'ضد كلمة "الوحدة"؟', opts:['العزلة','الانفراد','الاجتماع','الانفراد'], a:2},
+{type:'mcq', q:'ضد كلمة "الوحدة"؟', opts:['العزلة','الانفراد','الرفقة','الانعزال'], a:2},
 {type:'mcq', q:'مرادف كلمة "النشاط"؟', opts:['الكسل','الحيوية','الخمول','السكون'], a:1},
 {type:'mcq', q:'ما إعراب المبتدأ؟', opts:['منصوب','مجرور','مرفوع','مجزوم'], a:2},
 {type:'mcq', q:'جمع كلمة "نهر"؟', opts:['أنهار','نهور','أنهر','نهرات'], a:0},
-{type:'mcq', q:'جمع كلمة "طالب"؟', opts:['طلاب','طالبون فقط','طلبة','كل ما سبق صحيح'], a:3},
+{type:'mcq', q:'ما الجمع الأكثر شيوعاً لكلمة "طالب"؟', opts:['طلاب','طالبات فقط','طلاليب','طلبان'], a:0},
 {type:'mcq', q:'مرادف كلمة "العطاء"؟', opts:['المنع','الجود','البخل','الإمساك'], a:1},
 {type:'mcq', q:'ضد كلمة "الفرح"؟', opts:['السرور','الحزن','البهجة','المرح'], a:1},
 {type:'mcq', q:'الفعل الأمر من "يكتب" هو؟', opts:['كتب','اكتب','يكتب','كاتب'], a:1},
@@ -903,7 +1059,7 @@ const CATS = [
 {type:'mcq', q:'جمع كلمة "حديقة"؟', opts:['حدائق','حديقتان','حديقات','حدائيق'], a:0},
 {type:'mcq', q:'مرادف كلمة "الحنين"؟', opts:['الكراهية','الاشتياق','النسيان','الملل'], a:1},
 {type:'mcq', q:'ضد كلمة "البخيل"؟', opts:['المسرف','الكريم','المقتر','الشحيح'], a:1},
-{type:'mcq', q:'ما الفرق بين "الفعل المتعدي" و"الفعل اللازم"؟', opts:['لا فرق','المتعدي يحتاج مفعولًا به واللازم لا يحتاج','اللازم يحتاج مفعولًا والمتعدي لا','الفعل المتعدي ماضٍ واللازم مضارع'], a:1},
+{type:'mcq', q:'الفعل "أكل" يحتاج مفعولاً به (أكل التفاحةَ)، فهو فعل؟', opts:['لازم','متعدٍ','ناقص','جامد'], a:1},
 {type:'mcq', q:'مرادف كلمة "الوضوح"؟', opts:['الغموض','الجلاء','التعقيد','الإبهام'], a:1},
 {type:'mcq', q:'جمع كلمة "رسالة"؟', opts:['رسائل','رسالتان','رسالات','أرسلة'], a:0},
 {type:'mcq', q:'ضد كلمة "الحضور"؟', opts:['المجيء','الغياب','القدوم','التواجد'], a:1},
@@ -923,7 +1079,7 @@ const CATS = [
 {type:'fill', q:'اكتب مؤنث كلمة "أستاذ"', accept:['أستاذة']},
 {type:'mcq', q:'مرادف كلمة "الرحمة"؟', opts:['القسوة','الشفقة','الغلظة','الجفاء'], a:1},
 {type:'mcq', q:'جمع كلمة "سماء"؟', opts:['سماوات','سماءات','أسمية','سمايا'], a:0},
-{type:'mcq', q:'ما نوع "لا" في "لا تكذب"؟', opts:['لا النافية','لا الناهية','لا النافية للجنس','لا الزائدة'], a:1},
+{type:'mcq', q:'ما نوع الجملة "لا تكذب"؟', opts:['جملة خبرية','جملة نهي','جملة استفهام','جملة تعجب'], a:1},
 {type:'mcq', q:'مرادف كلمة "الحقد"؟', opts:['الحب','الضغينة','الوفاء','المودة'], a:1},
 {type:'mcq', q:'ضد كلمة "الغرور"؟', opts:['الكبر','التواضع','الخيلاء','الزهو'], a:1},
 {type:'fill', q:'اكتب فعل الأمر من "ذهب"', accept:['اذهب']},
@@ -933,20 +1089,19 @@ const CATS = [
 {type:'mcq', q:'ضد كلمة "السرعة"؟', opts:['الخِفَّة','البطء','الرشاقة','العجلة'], a:1},
 {type:'mcq', q:'جمع كلمة "سفينة"؟', opts:['سفن','سفينات','أسفنة','سفائن'], a:0},
 {type:'mcq', q:'مرادف كلمة "الفضيلة"؟', opts:['الرذيلة','المكرمة','الخسة','الدناءة'], a:1},
-{type:'mcq', q:'ضد كلمة "النجاح"؟', opts:['التفوق','الفوز','الإخفاق','النجاح المؤجل'], a:2},
+{type:'mcq', q:'مرادف كلمة "الاجتهاد"؟', opts:['الكسل','المثابرة','الإهمال','التقصير'], a:1},
 {type:'fill', q:'اكتب مرادف كلمة "عظيم"', accept:['كبير','جليل','رفيع','جسيم']},
 {type:'mcq', q:'ما الفرق بين الاسم النكرة والمعرفة؟', opts:['النكرة محدود والمعرفة غير محدودة','المعرفة تدل على شيء معين والنكرة غير معينة','لا فرق بينهما','المعرفة تُجمع والنكرة لا تُجمع'], a:1},
 {type:'mcq', q:'مرادف كلمة "الأصيل"؟', opts:['الغريب','العريق','الدخيل','الهجين'], a:1},
-{type:'mcq', q:'جمع كلمة "طريق"؟', opts:['طرق','طرقات','أطرقة','كل ما سبق صحيح'], a:3},
+{type:'mcq', q:'ما جمع كلمة "طريق"؟', opts:['طرق','طريقات','أطرقة','طروق'], a:0},
 {type:'mcq', q:'ضد كلمة "الحرية"؟', opts:['الانطلاق','الاستقلال','القيد','الاختيار'], a:2},
 {type:'mcq', q:'مرادف كلمة "الزهد"؟', opts:['الطمع','القناعة والتقشف','الحرص','الجشع'], a:1},
-{type:'mcq', q:'ما نوع الجملة "فاز الطالبُ"؟', opts:['اسمية','فعلية'], a:1},
 {type:'fill', q:'اكتب مصدر الفعل "قرأ"', accept:['قراءة']},
 {type:'mcq', q:'مرادف كلمة "الشجرة الباسقة"؟', opts:['القصيرة','المريضة','الطويلة الشامخة','الجرداء'], a:2},
 {type:'mcq', q:'ضد كلمة "الإقدام"؟', opts:['الشجاعة','الجرأة','الإحجام','الإقبال'], a:2},
 {type:'mcq', q:'مرادف كلمة "السكينة"؟', opts:['الاضطراب','الطمأنينة','القلق','الجزع'], a:1},
 {type:'mcq', q:'جمع كلمة "قصيدة"؟', opts:['قصائد','قصيدات','أقاصيد','قصيدون'], a:0},
-{type:'mcq', q:'ما نوع "ما" في جملة "ما أجمل السماء!"؟', opts:['ما الاستفهامية','ما التعجبية','ما النافية','ما الشرطية'], a:1},
+{type:'mcq', q:'ما نوع الجملة "ما أجمل السماء!"؟', opts:['جملة خبرية','جملة تعجب','جملة استفهام','جملة نهي'], a:1},
 {type:'mcq', q:'مرادف كلمة "الحكمة"؟', opts:['الجهل','الرشد','الغباء','الحمق'], a:1},
 {type:'mcq', q:'ضد كلمة "المحبة"؟', opts:['الوداد','الغرام','البغضاء','الشوق'], a:2},
 ]},
@@ -1027,7 +1182,7 @@ const CATS = [
 {type:'mcq', q:'Choose the opposite of "Light" (weight)', opts:['Dark','Heavy','Bright','Thin'], a:1},
 {type:'fill', q:'Complete: We have lived here ____ 2015. (since/for)', accept:['since']},
 {type:'mcq', q:'Choose the synonym of "Ill"', opts:['Healthy','Sick','Well','Fine'], a:1},
-{type:'mcq', q:'Which sentence uses "there" correctly?', opts:['Their going home',"They're going home",'There going home','Ther going home'], a:1},
+{type:'mcq', q:'Which sentence uses "there" correctly?', opts:['Put it their','Put it there',"Put it they're",'Put it thair'], a:1},
 {type:'mcq', q:'Choose the correct question tag: She is coming, ____?', opts:["isn't she","is she","doesn't she","wasn't she"], a:0},
 {type:'mcq', q:'Choose the synonym of "Repair"', opts:['Break','Fix','Damage','Ruin'], a:1},
 {type:'mcq', q:'What is the comparative of "far"?', opts:['farer','further','farest','more far'], a:1},
@@ -1068,7 +1223,7 @@ const CATS = [
 {type:'mcq', q:'كم عدد دول الخليج العربي؟', opts:['أربع','خمس','ست','سبع'], a:2},
 {type:'mcq', q:'ما عاصمة فرنسا؟', opts:['لندن','باريس','روما','برلين'], a:1},
 {type:'mcq', q:'ما أكبر قارة من حيث عدد السكان؟', opts:['أفريقيا','آسيا','أوروبا','أمريكا الجنوبية'], a:1},
-{type:'mcq', q:'ما اسم أصغر دولة في العالم من حيث المساحة؟', opts:['موناكو','الفاتيكان','سنغافورة','مالطا'], a:1},
+{type:'mcq', q:'ما اسم أصغر دولة مستقلة في العالم من حيث المساحة؟', opts:['موناكو','الفاتيكان','سنغافورة','مالطا'], a:1},
 {type:'mcq', q:'كم عدد اللاعبين في فريق كرة القدم الواحد على الملعب؟', opts:['9','10','11','12'], a:2},
 {type:'mcq', q:'ما عاصمة اليابان؟', opts:['بكين','سيول','طوكيو','بانكوك'], a:2},
 {type:'mcq', q:'ما اسم أكبر صحراء حارة في العالم؟', opts:['صحراء جوبي','الصحراء الكبرى','صحراء كالاهاري','صحراء آريزونا'], a:1},
@@ -1090,7 +1245,7 @@ const CATS = [
 {type:'mcq', q:'ما عاصمة ألمانيا؟', opts:['ميونخ','برلين','هامبورغ','فرانكفورت'], a:1},
 {type:'mcq', q:'ما اسم أصغر كوكب في المجموعة الشمسية؟', opts:['الأرض','المريخ','عطارد','الزهرة'], a:2},
 {type:'mcq', q:'ما عاصمة إيطاليا؟', opts:['ميلانو','روما','نابولي','البندقية'], a:1},
-{type:'mcq', q:'كم عدد الألعاب الأولمبية الصيفية تقريبًا كل كم سنة تُقام؟', opts:['كل سنتين','كل 3 سنوات','كل 4 سنوات','كل 5 سنوات'], a:2},
+{type:'mcq', q:'كل كم سنة تُقام الألعاب الأولمبية الصيفية؟', opts:['كل سنتين','كل 3 سنوات','كل 4 سنوات','كل 5 سنوات'], a:2},
 {type:'mcq', q:'ما اسم أكبر بحيرة في العالم؟', opts:['بحيرة فيكتوريا','بحر قزوين','بحيرة سوبيريور','بحيرة طبريا'], a:1},
 {type:'mcq', q:'ما عملة اليابان؟', opts:['اليوان','الين','الوون','الروبية'], a:1},
 {type:'mcq', q:'ما اسم أشهر برج في باريس؟', opts:['برج خليفة','برج إيفل','برج بيزا المائل','ساعة بيج بن'], a:1},
@@ -1098,7 +1253,6 @@ const CATS = [
 {type:'mcq', q:'ما اسم أشهر تمثال حرية في العالم ويقع في أمريكا؟', opts:['تمثال الحرية','تمثال المسيح الفادي','أبو الهول','تمثال ديفيد'], a:0},
 {type:'mcq', q:'ما عاصمة الصين؟', opts:['شنغهاي','بكين','هونغ كونغ','قوانغتشو'], a:1},
 {type:'mcq', q:'ما اسم أشهر ساعة في لندن؟', opts:['بيغ بن','ساعة غرينتش','برج الساعة','عين لندن'], a:0},
-{type:'mcq', q:'كم عدد أرجل العنكبوت؟', opts:['ستة','ثمانية','عشرة','اثنا عشر'], a:1},
 {type:'mcq', q:'ما اسم أطول سلسلة جبال في العالم؟', opts:['جبال الألب','جبال الأنديز','جبال الهيمالايا','جبال روكي'], a:1},
 {type:'mcq', q:'ما عاصمة كندا؟', opts:['تورنتو','أوتاوا','مونتريال','فانكوفر'], a:1},
 {type:'mcq', q:'كم عدد ألاعب في فريق كرة السلة على الملعب؟', opts:['4','5','6','7'], a:1},
@@ -1118,10 +1272,10 @@ const CATS = [
 {type:'mcq', q:'ما اسم الطائر الوطني لمصر؟', opts:['الصقر','النسر','الغرنوق','الحمامة'], a:0},
 {type:'mcq', q:'كم عدد الدول المشاركة في الأمم المتحدة تقريبًا؟', opts:['150','175','193','210'], a:2},
 {type:'mcq', q:'ما عاصمة الأرجنتين؟', opts:['ريو دي جانيرو','سانتياغو','بوينس آيرس','ليما'], a:2},
-{type:'mcq', q:'ما اسم أطول جدار بشري في التاريخ؟', opts:['جدار برلين','سور الصين العظيم','جدار أدريان','جدار غرب أفريقيا'], a:1},
+{type:'mcq', q:'ما اسم أطول سور بناه الإنسان في التاريخ؟', opts:['جدار برلين','سور الصين العظيم','جدار أدريان','جدار غرب أفريقيا'], a:1},
 {type:'mcq', q:'ما عاصمة الهند؟', opts:['مومباي','كولكاتا','نيودلهي','بنغالور'], a:2},
 {type:'mcq', q:'ما اسم أول إنسان وصل إلى القمر؟', opts:['يوري غاغارين','نيل أرمسترونغ','بوز ألدرين','جون غلن'], a:1},
-{type:'mcq', q:'كم عدد القارات التي تجمع إسمها الجغرافي بأوروبا وآسيا؟', opts:['واحدة','اثنتان','هي قارة واحدة تسمى أوراسيا','ثلاث'], a:2},
+{type:'mcq', q:'ما اسم أكبر قارة في العالم من حيث المساحة؟', opts:['أفريقيا','آسيا','أمريكا الشمالية','أوروبا'], a:1},
 {type:'mcq', q:'ما اسم المدينة التي تستضيف مقر الأمم المتحدة الرئيسي؟', opts:['واشنطن','جنيف','نيويورك','باريس'], a:2},
 {type:'mcq', q:'ما اسم أكبر بلد من حيث عدد السكان في العالم الآن؟', opts:['الصين','الهند','الولايات المتحدة','إندونيسيا'], a:1},
 {type:'mcq', q:'ما اسم أشهر فنان إيطالي رسم لوحة الموناليزا؟', opts:['مايكل أنجلو','رافائيل','ليوناردو دافنشي','بوتيتشيللي'], a:2},
@@ -1129,7 +1283,7 @@ const CATS = [
 {type:'mcq', q:'كم عدد الأبراج الفلكية (أبراج الحظ) الشهيرة؟', opts:['10','11','12','13'], a:2},
 {type:'mcq', q:'ما اسم أشهر رياضة للمبارزة في اليابان؟', opts:['كراتيه','جودو','كيندو','سومو'], a:2},
 {type:'mcq', q:'في أي قارة تقع دولة البرازيل؟', opts:['أمريكا الشمالية','أفريقيا','أمريكا الجنوبية','أستراليا'], a:2},
-{type:'mcq', q:'ما اسم أكبر محيط في العالم؟', opts:['المحيط الأطلسي','المحيط الهندي','المحيط الهادئ','البحر المتوسط'], a:2},
+{type:'mcq', q:'ما اسم أصغر محيط في العالم؟', opts:['الأطلسي','الهندي','الهادئ','المتجمد الشمالي'], a:3},
 {type:'mcq', q:'كم عدد أصابع اليد الواحدة؟', opts:['أربعة','خمسة','ستة','ثلاثة'], a:1},
 {type:'mcq', q:'ما اسم البلد الوحيد الذي يستضيف ثلاث عواصم؟', opts:['إثيوبيا','كينيا','جنوب أفريقيا','نيجيريا'], a:2},
 {type:'mcq', q:'ما اسم أعلى بناء صنعه الإنسان في التاريخ حاليًا؟', opts:['برج إيفل','أبراج بتروناس','برج خليفة','برج شنغهاي'], a:2},
@@ -1157,7 +1311,7 @@ const CATS = [
 {type:'mcq', q:'كم عدد دقائق مباراة كرة القدم؟', opts:['80 دقيقة','85 دقيقة','90 دقيقة','95 دقيقة'], a:2},
 {type:'mcq', q:'ما عاصمة تركيا؟', opts:['إسطنبول','أنقرة','إزمير','أنطاليا'], a:1},
 {type:'mcq', q:'ما اسم أكبر حيوان برمائي في العالم؟', opts:['الضفدع العملاق','السمندر العملاق الصيني','التمساح','السلحفاة البحرية'], a:1},
-{type:'mcq', q:'ما اسم نظام الكتابة الياباني المقطعي الأبسط؟', opts:['كانجي','هيراغانا','كاتاكانا','روماجي'], a:1},
+{type:'mcq', q:'ما اسم العملة الرسمية للمملكة المتحدة؟', opts:['اليورو','الجنيه الإسترليني','الدولار','الفرنك'], a:1},
 {type:'mcq', q:'كم عدد لاعبي كرة اليد على أرض الملعب لكل فريق؟', opts:['5','6','7','8'], a:2},
 {type:'mcq', q:'ما اسم ظاهرة المدّ والجزر في البحر؟', opts:['الأمواج','المدّ والجزر','التيارات','الشلالات البحرية'], a:1},
 ]},
@@ -1219,12 +1373,12 @@ const CATS = [
 {type:'mcq', q:'ما اسم العلم الذي يدرس النجوم والكواكب والفضاء؟', opts:['الفيزياء','الكيمياء','الفلك','الأحياء'], a:2},
 {type:'mcq', q:'ما اسم المادة التي يصنع منها الهيكل العظمي للإنسان أساسًا؟', opts:['الحديد','الكالسيوم','البروتين','الكربون'], a:1},
 {type:'mcq', q:'أي من التالي تجري في عروق النبات ليحمل الغذاء؟', opts:['الدم','العصارة النباتية','الماء فقط','الهواء'], a:1},
-{type:'mcq', q:'ما اسم المرحلة التي تنتقل فيها اليرقة إلى فراشة في حالة نوم؟', opts:['البيضة','اليرقة','الشرنقة (الحورية)','الحشرة الكاملة'], a:2},
+{type:'mcq', q:'ما اسم المرحلة التي تتحول فيها اليرقة إلى فراشة داخل غلاف واقٍ؟', opts:['البيضة','اليرقة','الشرنقة','الحشرة الكاملة'], a:2},
 {type:'mcq', q:'ما اسم الطبقة التي تحمي الأرض من الأشعة فوق البنفسجية؟', opts:['طبقة الستراتوسفير','طبقة الأوزون','طبقة التروبوسفير','طبقة الأيونوسفير'], a:1},
 {type:'mcq', q:'ما عدد أرجل الحشرة؟', opts:['أربعة','خمسة','ستة','ثمانية'], a:2},
 {type:'mcq', q:'ما اسم الغذاء الذي تصنعه النحلة وهو مادة شفاء؟', opts:['الحليب','العسل','السكر','الزيت'], a:1},
 {type:'mcq', q:'ما اسم عملية تحويل السكر إلى طاقة داخل الخلية؟', opts:['التمثيل الضوئي','التنفس الخلوي','التخمر','الانقسام'], a:1},
-{type:'mcq', q:'ما أسرع من الصوت؟', opts:['الصاروخ فقط','الطائرة العادية','الضوء','الريح'], a:2},
+{type:'mcq', q:'أي مما يلي يعتبر أسرع سرعة معروفة في الكون؟', opts:['الصوت','الضوء','الصاروخ','الريح'], a:1},
 {type:'mcq', q:'ما اسم الكوكب الذي يدور بجانبه (على جانبه) بدلًا من الوقوف المعتادي؟', opts:['المريخ','عطارد','أورانوس','نبتون'], a:2},
 {type:'mcq', q:'ما اسم العلم الذي يدرس التحولات الكيميائية للمواد؟', opts:['الفيزياء','الكيمياء','الأحياء','الجيولوجيا'], a:1},
 {type:'mcq', q:'ما اسم العظمة الأكبر في جسم الإنسان؟', opts:['عظمة الفخذ','الضلع','القصبة','الكتف'], a:0},
@@ -1263,33 +1417,28 @@ const CATS = [
 {type:'mcq', q:'ما اسم حركة الأرض حول الشمس؟', opts:['الدوران حول المحور','الثورة (الدورة السنوية)','الانحراف المحوري','الموجة الحرارية'], a:1},
 {type:'mcq', q:'ما اسم الجسم السماوي الذي يُضيء بضوء مُعار من الشمس؟', opts:['النجم','القمر','المذنب','النيزك'], a:1},
 {type:'mcq', q:'ما اسم القوة التي تعمل على إبطاء الحركة بين السطحين المتلامسين؟', opts:['الجاذبية','قوة الطفو','الاحتكاك','التوتر السطحي'], a:2},
-{type:'mcq', q:'ما اسم الجهاز العصبي الذي يتحكم في وظائف الجسم اللاإرادية مثل ضربات القلب؟', opts:['الجهاز العصبي المركزي','الجهاز العصبي الذاتي','الجهاز الحركي','الجهاز الحسي'], a:1},
+{type:'mcq', q:'ما اسم الجهاز الذي يتحكم في ضربات القلب والتنفس بدون تدخل إرادي منا؟', opts:['الجهاز العصبي المركزي','الجهاز العصبي اللاإرادي','الجهاز الحركي','الجهاز الحسي'], a:1},
 {type:'mcq', q:'ما اسم مجموعة الكائنات الحية التي تحلّل المواد العضوية الميتة؟', opts:['المنتجون','المستهلكون','المحللون','المفترسون'], a:2},
 ]},
 {id:'riddles', name:'فوازير وألغاز', icon:'🧩', q:[
-{type:'mcq', q:'له عين ولا يرى، ما هو؟', opts:['الإبرة', 'الخيط', 'المسمار', 'المشط'], a:0},
 {type:'mcq', q:'شيء كلما أخذت منه كبر، ما هو؟', opts:['الحفرة', 'الجبل', 'البحر', 'الغابة'], a:0},
 {type:'mcq', q:'يمشي ولا أرجل له، ويبكي ولا عيون له، ما هو؟', opts:['السحاب', 'الريح', 'النهر', 'الصحراء'], a:0},
 {type:'mcq', q:'ما الشيء الذي يكتب ولا يقرأ؟', opts:['القلم', 'الكتاب', 'اللوح', 'الورقة'], a:0},
 {type:'mcq', q:'له أسنان ولا يعض، ما هو؟', opts:['المشط', 'المنشار', 'القط', 'الملعقة'], a:0},
 {type:'mcq', q:'ما الشيء الذي كلما زاد نقص؟', opts:['العمر', 'الوقت', 'المال', 'الماء'], a:0},
 {type:'mcq', q:'بيت يهتز ولا يسقط، ما هو؟', opts:['بيت العنكبوت', 'الخيمة', 'القارب', 'العشة'], a:0},
-{type:'mcq', q:'شيء له رأس ولا عقل له، ما هو؟', opts:['المسمار', 'العصا', 'الزجاجة', 'الحجر'], a:0},
 {type:'mcq', q:'ما الشيء الذي تراه في الليل ثلاث مرات وفي الأسبوع مرة واحدة وفي السنة مرة واحدة؟', opts:['حرف اللام', 'حرف الألف', 'حرف الميم', 'حرف النون'], a:0},
 {type:'mcq', q:'يدخل الماء ولا يبتل، ما هو؟', opts:['الضوء', 'الحجر', 'الهواء', 'الملح'], a:0},
 {type:'mcq', q:'ما الشيء الذي ليس له بداية ولا نهاية؟', opts:['الدائرة', 'الخط المستقيم', 'الشعاع', 'الزاوية'], a:0},
 {type:'mcq', q:'شيء كله ثقوب ويحمل الماء، ما هو؟', opts:['الإسفنجة', 'الغربال', 'الشبكة', 'القصبة'], a:0},
 {type:'mcq', q:'شيء أسود حين يكون نظيفًا، ما هو؟', opts:['السبورة', 'الفحم', 'الزجاج', 'الحديد'], a:0},
 {type:'mcq', q:'شيء يكبر في الشتاء ويصغر في الصيف، ما هو؟', opts:['الثلج', 'الجليد النهري', 'البحيرة', 'الجبل'], a:0},
-{type:'mcq', q:'شيء له أصابع لكن لا يد له، ما هو؟', opts:['القفاز', 'الإصبع الصناعي', 'الكف', 'الكرسي'], a:0},
-{type:'mcq', q:'بيت ليس له سقف ولا جدران، ما هو؟', opts:['عش الطائر', 'الخيمة', 'الكهف', 'الدار'], a:0},
 {type:'mcq', q:'شيء يتكلم كل اللغات لكنه لا يذهب للمدرسة أبدًا، ما هو؟', opts:['الصدى', 'الرياح', 'المذياع', 'الهاتف'], a:0},
 {type:'mcq', q:'بيت أحمر من الداخل أخضر من الخارج، ما هو؟', opts:['البطيخ', 'اللوز', 'الجوز', 'الرمان'], a:0},
 {type:'mcq', q:'شيء له أوراق وليس نباتًا، ما هو؟', opts:['الكتاب', 'الورد', 'الشجرة', 'الزهرة'], a:0},
 {type:'mcq', q:'شيء له مفاتيح ولا يفتح بابًا، ما هو؟', opts:['البيانو', 'السيارة', 'الخزانة', 'القفل'], a:0},
-{type:'mcq', q:'شيء يُرسَل لكن لا يُبعَث ويُستقبَل لكن لا يُمسَك، ما هو؟', opts:['البريد الإلكتروني', 'الطرد', 'الرسالة الورقية', 'الهدية'], a:0},
+{type:'mcq', q:'شيء يصلك في ثوانٍ من أي مكان في العالم دون ورق أو طابع، ما هو؟', opts:['البريد الإلكتروني', 'الطرد', 'الرسالة الورقية', 'الهدية'], a:0},
 {type:'mcq', q:'ما الشيء الذي يتشقق بلا إصبع ولا يد؟', opts:['الأرض جفافًا', 'الجبل', 'الزجاج', 'الخشب'], a:0},
-{type:'mcq', q:'ما الشيء الذي له ظهر ولا يحمل وله بطن ولا يأكل؟', opts:['الكتاب', 'الكرسي', 'الحقيبة', 'الصندوق'], a:0},
 {type:'mcq', q:'شيء يموت إذا شربت ماء، ما هو؟', opts:['الملح', 'النار', 'الحريق', 'السكر'], a:1},
 {type:'mcq', q:'ما الشيء الذي ينتهي حين تُسمّيه؟', opts:['الأمل', 'الصمت', 'الحلم', 'السر'], a:1},
 {type:'mcq', q:'ما الشيء الذي كلما نظفته اتسخ أكثر؟', opts:['المنشفة', 'الماء', 'الصابون', 'الممسحة'], a:1},
@@ -1318,13 +1467,60 @@ const CATS = [
 {type:'mcq', q:'ما الشيء الذي له أسنان كثيرة لكنه لا يؤلمك؟', opts:['القط', 'المشط', 'الأسد', 'المنشار'], a:1},
 {type:'mcq', q:'ما الشيء الذي يمكن رؤيته في الليل لكن يختفي نهارًا؟', opts:['الظل', 'النجوم', 'القمر', 'البومة'], a:1},
 {type:'mcq', q:'شيء يكبر لأسفل ويُولد من الماء، ما هو؟', opts:['الشجرة', 'الثلج والجليد', 'النبات', 'الجذر'], a:1},
-{type:'mcq', q:'ما الشيء الذي إذا مات أبقى آثاره للأبد؟', opts:['الزهرة', 'الإنسان', 'الحيوان', 'النار'], a:1},
-{type:'mcq', q:'ما الشيء الذي له أذنان ولا يسمع؟', opts:['الصخرة', 'الإبريق', 'الجدار', 'الزجاجة'], a:1},
 {type:'mcq', q:'ما الشيء الذي ليس له لون لكن يعكس كل الألوان؟', opts:['الزجاج', 'المرآة', 'الماء', 'الهواء'], a:1},
 {type:'mcq', q:'شيء تراه لكن لا تستطيع لمسه، ما هو؟', opts:['الزجاج', 'الظل', 'الهواء', 'الماء'], a:1},
 {type:'mcq', q:'ما الشيء الذي ينمو بلا جذور؟', opts:['الفطر', 'الجبل', 'الصخرة', 'الجليد'], a:1},
-{type:'mcq', q:'ما الشيء الذي له أرجل كثيرة لكنه لا يمشي؟', opts:['العنكبوت', 'الطاولة', 'الديدان', 'الحشرة'], a:1},
 {type:'mcq', q:'ما الشيء الذي تجد له أثرًا ولا تجده؟', opts:['الريح', 'الوقت', 'الفكرة', 'الحلم'], a:0},
+{type:'mcq', q:'أنا سلسلة من الحروف والأرقام تحميك من الدخلاء، لا تشاركني مع أحد أبدًا، ما أنا؟', opts:['اسم المستخدم','كلمة السر','البريد الإلكتروني','رقم الهاتف'], a:1},
+{type:'mcq', q:'أظهر فجأة على شاشتك أعدك بجائزة مجانية إذا ضغطت عليّ، لكنني في الحقيقة خطر، ما أنا؟', opts:['رابط مشبوه (فيروس)','إعلان صادق','تطبيق آمن','تحديث النظام'], a:0},
+{type:'mcq', q:'أطلب منك أرقام بطاقتك أو كلمة سرك بطريقة مخادعة، أتظاهر بأنني شركة موثوقة، من أنا؟', opts:['برنامج تعليمي','محاولة تصيد احتيالي','رسالة من صديق','إشعار عادي'], a:1},
+{type:'mcq', q:'كلما كنت أطول وأعقد بحروف وأرقام ورموز مختلفة، كلما كنت أقوى وأصعب على الاختراق، من أنا؟', opts:['اسم المستخدم','كلمة السر القوية','البريد الإلكتروني','رقم الهاتف'], a:1},
+{type:'mcq', q:'أنصحك ألا تشاركني مع الغرباء على الإنترنت، فأنا اسمك الكامل وعنوانك ومدرستك، ما أنا؟', opts:['المعلومات الشخصية','الصورة الشخصية','اسم المستخدم','كلمة السر'], a:0},
+{type:'mcq', q:'أعطيك طبقة حماية إضافية بعد كلمة السر، أرسل لك رمزًا على هاتفك للتأكد أنك أنت، ما أنا؟', opts:['كلمة السر فقط','التحقق بخطوتين','اسم المستخدم','البريد الإلكتروني'], a:1},
+{type:'mcq', q:'لا تضغط عليّ إذا جاءتك من شخص لا تعرفه، فقد أحمل فيروسًا يضر جهازك، ما أنا؟', opts:['رابط أو ملف مرفق مشبوه','رسالة من المدرسة','تحديث تطبيق رسمي','إعلان بنك حقيقي'], a:0},
+{type:'mcq', q:'أحمي جهازك من البرامج الضارة، وأفحص كل ملف يدخل جهازك، من أنا؟', opts:['المتصفح','برنامج مكافحة الفيروسات','لوحة المفاتيح','الطابعة'], a:1},
+{type:'mcq', q:'أنا الوقت الذي تقضيه أمام الشاشة، من الحكمة أن تحدني حتى لا أستهلك يومك كله، ما أنا؟', opts:['وقت الشاشة','سرعة الإنترنت','حجم الملف','عدد التطبيقات'], a:0},
+{type:'mcq', q:'أظهر كأنني صديقك على الإنترنت، لكن هويتي الحقيقية قد تكون مختلفة تمامًا، من أنا؟', opts:['صديق حقيقي في المدرسة','شخص غريب يتظاهر بالصداقة (تصيد اجتماعي)','معلم موثوق','أحد أفراد العائلة'], a:1},
+{type:'mcq', q:'يجب أن تخبر أحد والديك أو المعلم فورًا إذا واجهتني، فأنا كلام مؤذٍ أو تهديد على الإنترنت، ما أنا؟', opts:['رسالة ترحيب','التنمر الإلكتروني','دعوة للعب','مسابقة تعليمية'], a:1},
+{type:'mcq', q:'أنا الإعداد الذي يحدد من يمكنه رؤية صورك ومنشوراتك على مواقع التواصل، من أنا؟', opts:['إعدادات الخصوصية','إعدادات الصوت','إعدادات اللغة','إعدادات الطباعة'], a:0},
+{type:'mcq', q:'لا تثق بي فورًا حتى لو بدوت حقيقيًا، فقد أكون معلومة كاذبة تنتشر بسرعة على الإنترنت، ما أنا؟', opts:['خبر موثق من مصدر رسمي','الشائعة أو الخبر الكاذب','الكتاب المدرسي','الموسوعة العلمية'], a:1},
+{type:'mcq', q:'يُفضّل أن تسأل أحد والديك قبل تحميلي، فقد أكون تطبيقًا يجمع بياناتك دون علمك، ما أنا؟', opts:['تطبيق تعليمي موثوق','تطبيق مجهول المصدر','لعبة رسمية من متجر موثوق','تطبيق حكومي'], a:1},
+{type:'mcq', q:'أنا الرمز الصغير الذي يظهر بجانب عنوان الموقع، ووجودي يعني أن اتصالك بالموقع آمن ومشفر، ما أنا؟', opts:['رمز القفل (HTTPS)','أيقونة الصوت','زر الإعجاب','أيقونة البحث'], a:0},
+{type:'mcq', q:'لا تلتقط أو تشارك صورة لشخص آخر دون إذنه، فهذا يخالف احترام خصوصيته، أي مبدأ أنا؟', opts:['حرية التعبير','احترام خصوصية الآخرين','سرعة النشر','الشهرة الرقمية'], a:1},
+{type:'mcq', q:'أنا النسخة الاحتياطية من ملفاتك المهمة، أحميها في حال ضاع جهازك أو تعطّل، من أنا؟', opts:['الفيروس','النسخ الاحتياطي (Backup)','ملف مؤقت','سجل التصفح'], a:1},
+{type:'mcq', q:'إذا شعرت بالخوف أو الانزعاج من محادثة على الإنترنت، فأول خطوة صحيحة أن تفعل ماذا؟', opts:['تتجاهل وتستمر بالحديث','تخبر أحد الكبار الموثوقين','تحذف حسابك فورًا بدون إخبار أحد','ترد بنفس الأسلوب'], a:1},
+{type:'mcq', q:'أنا نوع من الرسائل الإلكترونية غير المرغوب فيها التي تصل بكثرة لصندوق بريدك، ما أنا؟', opts:['البريد المهم','البريد المزعج (سبام)','الملف المرفق','جهة الاتصال'], a:1},
+{type:'mcq', q:'يجب أن تتأكد من هوية الشخص الحقيقية قبل أن تلتقي به شخصيًا ممن تعرفت عليه عبر الإنترنت فقط، ولا تفعل ذلك أبدًا دون معرفة والديك، أي قاعدة أنا؟', opts:['قاعدة السرعة','قاعدة الأمان في اللقاءات','قاعدة السرية التامة','قاعدة عدم الرد'], a:1},
+{type:'mcq', q:'أنا الإعداد الذي يمنع ظهور محتوى غير مناسب لعمرك على الإنترنت، من أنا؟', opts:['الرقابة الأبوية (فلترة المحتوى)','محرك البحث','سجل المتصفح','سرعة الإنترنت'], a:0},
+{type:'mcq', q:'لا تشارك موقعك الجغرافي الحالي مع الغرباء على الإنترنت، فهذا يكشف مكانك الحقيقي، أي معلومة أنا؟', opts:['اسم اللعبة المفضلة','الموقع الجغرافي (GPS)','لون الملابس','نوع الجهاز'], a:1},
+{type:'mcq', q:'أنا العادة الجيدة التي تعني تسجيل الخروج من حسابك عند استخدام جهاز مشترك مع آخرين، ما أنا؟', opts:['تسجيل الخروج (Logout)','حفظ كلمة السر تلقائيًا','إبقاء الحساب مفتوحًا دائمًا','مشاركة الجهاز بدون قفل'], a:0},
+{type:'mcq', q:'أظهر برسالة تقول \'لقد ربحت جائزة كبرى!\' رغم أنك لم تشارك في أي مسابقة، من أنا على الأغلب؟', opts:['رسالة صادقة من متجر موثوق','احتيال إلكتروني','إشعار من المدرسة','تحديث تطبيق'], a:1},
+{type:'mcq', q:'أنا الخاصية التي تسمح لك بحظر شخص مزعج من التواصل معك على مواقع التواصل، من أنا؟', opts:['خاصية الحظر (Block)','خاصية الإعجاب','خاصية المشاركة','خاصية التعليق'], a:0},
+{type:'mcq', q:'يجب أن تفكر قبل أن تنشرني، لأنني بمجرد نشري على الإنترنت قد أبقى للأبد ويصعب حذفي تمامًا، ما أنا؟', opts:['أي محتوى تنشره (بصمتك الرقمية)','رسالة مؤقتة تختفي فورًا','ملف محلي على جهازك فقط','مسودة غير منشورة'], a:0},
+{type:'mcq', q:'لا تفتح مرفقات البريد الإلكتروني من مرسل لا تعرفه، فقد أكون برنامجًا ضارًا يصيب جهازك، من أنا؟', opts:['ملف صورة من صديق','مرفق مشبوه من مجهول','رسالة نصية عادية','إشعار تطبيق'], a:1},
+{type:'mcq', q:'أنا القاعدة التي تقول: لا تستخدم نفس كلمة السر لكل حساباتك، لماذا هذا مهم؟', opts:['لأنه أسهل للتذكر فقط','لأنه إذا اخترق حساب واحد يبقى الباقي آمنًا','لأنه يبطئ الجهاز','لا يوجد سبب حقيقي'], a:1},
+{type:'mcq', q:'أظهر أحيانًا كنافذة منبثقة تطلب منك تحديث المتصفح فورًا وبشكل مستعجل جدًا، وقد أكون خدعة، من أنا غالبًا؟', opts:['تحديث رسمي من الشركة','نافذة احتيال مزيفة','رسالة من المدرسة','إشعار أمان حقيقي'], a:1},
+{type:'mcq', q:'أنا الشبكة العامة المجانية في المقاهي والمطارات، يُفضّل الحذر عند استخدامي لأمور حساسة كالبنوك، من أنا؟', opts:['شبكة واي فاي منزلية آمنة','شبكة واي فاي عامة مفتوحة','شبكة بيانات الهاتف الخاصة','شبكة داخلية للمدرسة'], a:1},
+{type:'mcq', q:'قبل تحميل أي لعبة أو تطبيق جديد، من الحكمة أن تتأكد من ماذا أولًا؟', opts:['لون أيقونته فقط','أنه من متجر تطبيقات رسمي وموثوق','عدد أصدقائك الذين حملوه','سرعة تحميله فقط'], a:1},
+{type:'mcq', q:'أنا نوع من البرامج يتجسس على نشاطك ويسجل ما تكتبه دون علمك، ما أنا؟', opts:['برنامج تصفح آمن','برنامج تجسس (Spyware)','برنامج تعليمي','برنامج ألعاب'], a:1},
+{type:'mcq', q:'إذا طلب منك أحدهم عبر الإنترنت صورة شخصية خاصة أو محرجة، فما الفعل الصحيح؟', opts:['ترسلها لأنه طلب بأدب','ترفض وتخبر أحد الكبار الموثوقين فورًا','تسأله عن سبب الطلب أولًا','تتجاهله دون إخبار أحد'], a:1},
+{type:'mcq', q:'أنا الميزة التي تسمح لك برؤية من قام بتسجيل الدخول لحسابك من أجهزة أخرى، من أنا؟', opts:['سجل النشاط وتسجيلات الدخول','سجل المفضلة','سجل التنزيلات','سجل الطباعة'], a:0},
+{type:'mcq', q:'لا تصدق كل ما تراه من صور أو فيديوهات على الإنترنت فورًا، فبعضها قد يكون معدلًا أو مفبركًا، ما اسم هذه المهارة المهمة؟', opts:['التفكير النقدي الرقمي','النسخ السريع','المشاركة الفورية','التصديق التلقائي'], a:0},
+{type:'mcq', q:'أنا نوع من الحسابات المزيفة التي تنتحل شخصية أخرى على مواقع التواصل، ما أنا؟', opts:['حساب موثق رسمي','حساب مزيف (منتحل الهوية)','حساب عائلي مشترك','حساب مدرسي رسمي'], a:1},
+{type:'mcq', q:'عندما ترى منشورًا يحرّض على كراهية أو عنف تجاه شخص أو مجموعة، ما التصرف الصحيح؟', opts:['تشاركه مع أصدقائك','تبلغ عنه ولا تشاركه','تعلق عليه بغضب','تتجاهله فقط دون إبلاغ'], a:1},
+{type:'mcq', q:'أنا الوقت المناسب لتحديث كلمة السر الخاصة بك، متى يُفضّل ذلك؟', opts:['كل يوم','بشكل دوري أو عند الشك بأنها اختُرقت','مرة واحدة في العمر','لا داعي للتحديث أبدًا'], a:1},
+{type:'mcq', q:'أنا الشخص الذي يجب أن تخبره أولًا إذا رأيت محتوى مزعجًا أو خطيرًا على الإنترنت، من أنا؟', opts:['صديق في نفس عمرك','أحد الوالدين أو معلم موثوق','شخص غريب في نفس المحادثة','لا أحد، تتجاهل الأمر'], a:1},
+{type:'mcq', q:'أنا الخطوة التي تمنع أي شخص من معرفة كلمة سرك حتى لو رآك تكتبها، ما أنا؟', opts:['كتابتها بصوت عالٍ','حجب الشاشة عند الكتابة','كتابتها على ورقة ولصقها بالشاشة','مشاركتها مع صديق مقرب فقط'], a:1},
+{type:'mcq', q:'أظهر كرسالة عاجلة تدّعي أن حسابك سيُغلق خلال ساعة إن لم تضغط على رابط فورًا، ما أسلوبي هذا؟', opts:['تنبيه أمان حقيقي وموثوق','أسلوب ضغط نفسي في الاحتيال (استعجالك التخاذ قرار خاطئ)','رسالة ترحيبية عادية','إشعار تحديث بسيط'], a:1},
+{type:'mcq', q:'أنا العادة الجيدة التي تعني عدم الكشف عن اسم مدرستك أو موقعها في محادثاتك العامة على الإنترنت، لماذا أنا مهمة؟', opts:['لأنها معلومة غير مهمة','لأنها قد تُستخدم لتحديد مكانك الحقيقي','لأنها تجعلك تبدو أكبر سنًا','لا سبب حقيقي'], a:1},
+{type:'mcq', q:'أنا الرمز 🔒 الذي يظهر بجانب اسم شبكة الواي فاي، ماذا يعني وجودي؟', opts:['الشبكة مفتوحة للجميع بدون كلمة سر','الشبكة محمية بكلمة سر','الشبكة بطيئة','الشبكة معطلة'], a:1},
+{type:'mcq', q:'إذا اكتشفت أن صديقك يتعرض للتنمر الإلكتروني، ما أفضل تصرف؟', opts:['تتجاهل الأمر لأنه لا يخصك','تدعمه وتساعده على إخبار شخص كبير موثوق','تشارك في السخرية منه أيضًا','تحذف صداقته فقط'], a:1},
+{type:'mcq', q:'أنا الإعداد الذي يمنع الغرباء من إرسال رسائل مباشرة لك على مواقع التواصل، من أنا؟', opts:['إعداد قبول الرسائل من الجميع','إعداد تقييد الرسائل للأصدقاء فقط','إعداد حذف الحساب','إعداد تغيير الاسم'], a:1},
+{type:'mcq', q:'لا تضغط أبدًا على روابط تعدك بالحصول على \'متابعين مجانًا\' أو \'عملات مجانية في اللعبة\'، لأنني غالبًا ماذا؟', opts:['عرض حقيقي من الشركة','محاولة احتيال أو سرقة حسابك','هدية من صديق','مكافأة رسمية'], a:1},
+{type:'mcq', q:'أنا المهارة التي تعني التحقق من صحة معلومة من مصدرين موثوقين على الأقل قبل تصديقها أو مشاركتها، ما اسمي؟', opts:['التحقق من المصادر','النشر السريع','التصديق الفوري','التجاهل التام'], a:0},
+{type:'mcq', q:'عمرك المناسب حسب معظم القوانين لإنشاء حساب مستقل على مواقع التواصل الاجتماعي بدون إشراف يكون غالبًا من كم سنة؟', opts:['أي عمر بدون قيود','13 سنة فأكثر عادة، وبإشراف الوالدين قبل ذلك','5 سنوات','لا يوجد عمر محدد أبدًا'], a:1},
+{type:'mcq', q:'أنا الأداة التي تتيح لوالديك معرفة التطبيقات التي تستخدمها والوقت الذي تقضيه عليها، من أنا؟', opts:['أدوات الرقابة الأبوية','محرك البحث','متصفح الإنترنت','تطبيق الألعاب'], a:0},
+{type:'mcq', q:'إذا تلقيت رسالة من \'صديق\' تطلب منك مالًا بشكل مفاجئ وغريب الأسلوب، فماذا يعني هذا غالبًا؟', opts:['صديقك بالتأكيد يحتاج مساعدة فورية','قد يكون حسابه مخترقًا من شخص آخر','يجب إرسال المال فورًا دون سؤال','رسالة عادية لا تستدعي القلق'], a:1},
 ]},
 {id:'times', name:'جدول الضرب', icon:'✖️', q:[
 {type:'mcq', q:'2 × 11 = ؟', opts:[25, 22, 19, 24], a:1},
@@ -1333,7 +1529,7 @@ const CATS = [
 {type:'mcq', q:'12 × 7 = ؟', opts:[84, 90, 88, 82], a:0},
 {type:'mcq', q:'9 × 9 = ؟', opts:[85, 81, 76, 87], a:1},
 {type:'mcq', q:'4 × 10 = ؟', opts:[43, 34, 40, 38], a:2},
-{type:'mcq', q:'10 × 4 = ؟', opts:[44, 40, 36, 34], a:1},
+{type:'mcq', q:'36 ÷ 12 = ؟', opts:[6,2,3,1], a:2},
 {type:'mcq', q:'10 × 2 = ؟', opts:[18, 17, 15, 20], a:3},
 {type:'mcq', q:'10 × 11 = ؟', opts:[114, 110, 106, 105], a:1},
 {type:'mcq', q:'8 × 12 = ؟', opts:[100, 99, 101, 96], a:3},
@@ -1347,10 +1543,10 @@ const CATS = [
 {type:'mcq', q:'9 × 3 = ؟', opts:[30, 32, 27, 21], a:2},
 {type:'mcq', q:'6 × 9 = ؟', opts:[58, 60, 54, 48], a:2},
 {type:'mcq', q:'11 × 12 = ؟', opts:[135, 132, 138, 126], a:1},
-{type:'mcq', q:'2 × 10 = ؟', opts:[20, 23, 18, 15], a:0},
+{type:'mcq', q:'120 ÷ 12 = ؟', opts:[11,12,7,10], a:3},
 {type:'mcq', q:'7 × 8 = ؟', opts:[60, 61, 50, 56], a:3},
-{type:'mcq', q:'11 × 2 = ؟', opts:[20, 28, 22, 26], a:2},
-{type:'mcq', q:'10 × 9 = ؟', opts:[93, 90, 87, 85], a:1},
+{type:'mcq', q:'25 ÷ 5 = ؟', opts:[3,2,5,7], a:2},
+{type:'mcq', q:'66 ÷ 11 = ؟', opts:[6,3,9,4], a:0},
 {type:'mcq', q:'2 × 9 = ؟', opts:[24, 21, 18, 14], a:2},
 {type:'mcq', q:'2 × 3 = ؟', opts:[12, 6, 4, 1], a:1},
 {type:'mcq', q:'9 × 4 = ؟', opts:[33, 32, 31, 36], a:3},
@@ -1358,7 +1554,7 @@ const CATS = [
 {type:'mcq', q:'4 × 6 = ؟', opts:[24, 26, 29, 22], a:0},
 {type:'mcq', q:'12 × 12 = ؟', opts:[150, 148, 141, 144], a:3},
 {type:'mcq', q:'3 × 12 = ؟', opts:[41, 32, 36, 38], a:2},
-{type:'mcq', q:'6 × 10 = ؟', opts:[54, 55, 60, 58], a:2},
+{type:'mcq', q:'20 ÷ 4 = ؟', opts:[6,4,2,5], a:3},
 {type:'mcq', q:'5 × 10 = ؟', opts:[52, 44, 46, 50], a:3},
 {type:'mcq', q:'6 × 8 = ؟', opts:[48, 50, 44, 51], a:0},
 {type:'mcq', q:'8 × 2 = ؟', opts:[22, 10, 20, 16], a:3},
@@ -1371,62 +1567,62 @@ const CATS = [
 {type:'mcq', q:'7 × 2 = ؟', opts:[20, 14, 8, 9], a:1},
 {type:'mcq', q:'10 × 12 = ؟', opts:[116, 115, 120, 124], a:2},
 {type:'mcq', q:'4 × 2 = ؟', opts:[8, 11, 13, 6], a:0},
-{type:'mcq', q:'7 × 10 = ؟', opts:[64, 76, 70, 65], a:2},
-{type:'mcq', q:'7 × 12 = ؟', opts:[87, 88, 84, 90], a:2},
+{type:'mcq', q:'18 ÷ 2 = ؟', opts:[6,10,11,9], a:3},
+{type:'mcq', q:'132 ÷ 12 = ؟', opts:[9,10,13,11], a:3},
 {type:'mcq', q:'4 × 3 = ؟', opts:[12, 9, 17, 8], a:0},
-{type:'mcq', q:'5 × 9 = ؟', opts:[40, 49, 39, 45], a:3},
+{type:'mcq', q:'18 ÷ 6 = ؟', opts:[3,1,2,4], a:0},
 {type:'mcq', q:'11 × 3 = ؟', opts:[33, 31, 28, 37], a:0},
 {type:'mcq', q:'12 × 5 = ؟', opts:[60, 65, 63, 55], a:0},
 {type:'mcq', q:'4 × 4 = ؟', opts:[16, 11, 18, 14], a:0},
-{type:'mcq', q:'2 × 8 = ؟', opts:[10, 20, 16, 19], a:2},
-{type:'mcq', q:'7 × 3 = ؟', opts:[27, 15, 24, 21], a:3},
-{type:'mcq', q:'8 × 6 = ؟', opts:[48, 51, 44, 43], a:0},
-{type:'mcq', q:'3 × 9 = ؟', opts:[33, 27, 21, 22], a:1},
-{type:'mcq', q:'6 × 7 = ؟', opts:[36, 42, 38, 47], a:1},
-{type:'mcq', q:'12 × 11 = ؟', opts:[126, 129, 136, 132], a:3},
+{type:'mcq', q:'28 ÷ 4 = ؟', opts:[10,7,6,5], a:1},
+{type:'mcq', q:'132 ÷ 11 = ؟', opts:[14,15,12,10], a:2},
+{type:'mcq', q:'48 ÷ 8 = ؟', opts:[8,4,6,9], a:2},
+{type:'mcq', q:'14 ÷ 2 = ؟', opts:[7,6,4,8], a:0},
+{type:'mcq', q:'60 ÷ 5 = ؟', opts:[10,15,12,13], a:2},
+{type:'mcq', q:'100 ÷ 10 = ؟', opts:[10,9,12,13], a:0},
 {type:'mcq', q:'5 × 11 = ؟', opts:[50, 51, 55, 57], a:2},
-{type:'mcq', q:'2 × 4 = ؟', opts:[8, 2, 3, 5], a:0},
+{type:'mcq', q:'35 ÷ 7 = ؟', opts:[3,6,7,5], a:3},
 {type:'mcq', q:'11 × 7 = ؟', opts:[72, 71, 80, 77], a:3},
 {type:'mcq', q:'8 × 9 = ؟', opts:[70, 69, 72, 74], a:2},
 {type:'mcq', q:'8 × 10 = ؟', opts:[86, 85, 80, 84], a:2},
 {type:'mcq', q:'5 × 5 = ؟', opts:[25, 31, 19, 27], a:0},
-{type:'mcq', q:'6 × 4 = ؟', opts:[28, 18, 29, 24], a:3},
-{type:'mcq', q:'5 × 6 = ؟', opts:[30, 32, 26, 34], a:0},
+{type:'mcq', q:'48 ÷ 4 = ؟', opts:[15,13,10,12], a:3},
+{type:'mcq', q:'99 ÷ 11 = ؟', opts:[6,8,11,9], a:3},
 {type:'mcq', q:'2 × 12 = ؟', opts:[27, 30, 22, 24], a:3},
 {type:'mcq', q:'9 × 12 = ؟', opts:[103, 108, 113, 112], a:1},
 {type:'mcq', q:'3 × 6 = ؟', opts:[22, 18, 14, 24], a:1},
 {type:'mcq', q:'8 × 4 = ؟', opts:[35, 27, 32, 29], a:2},
-{type:'mcq', q:'7 × 5 = ؟', opts:[37, 39, 35, 31], a:2},
-{type:'mcq', q:'2 × 7 = ؟', opts:[18, 17, 14, 20], a:2},
+{type:'mcq', q:'84 ÷ 12 = ؟', opts:[4,7,6,8], a:1},
+{type:'mcq', q:'60 ÷ 6 = ؟', opts:[8,10,7,12], a:1},
 {type:'mcq', q:'5 × 2 = ؟', opts:[10, 16, 13, 6], a:0},
 {type:'mcq', q:'6 × 2 = ؟', opts:[12, 16, 10, 7], a:0},
-{type:'mcq', q:'6 × 3 = ؟', opts:[21, 18, 12, 24], a:1},
+{type:'mcq', q:'40 ÷ 4 = ؟', opts:[9,12,10,7], a:2},
 {type:'mcq', q:'3 × 3 = ؟', opts:[4, 9, 13, 3], a:1},
 {type:'mcq', q:'6 × 6 = ؟', opts:[40, 36, 34, 30], a:1},
-{type:'mcq', q:'11 × 5 = ؟', opts:[50, 52, 61, 55], a:3},
-{type:'mcq', q:'12 × 3 = ؟', opts:[39, 41, 38, 36], a:3},
-{type:'mcq', q:'9 × 7 = ؟', opts:[58, 63, 61, 69], a:1},
+{type:'mcq', q:'42 ÷ 7 = ؟', opts:[3,8,4,6], a:3},
+{type:'mcq', q:'30 ÷ 3 = ؟', opts:[10,11,13,8], a:0},
+{type:'mcq', q:'50 ÷ 5 = ؟', opts:[10,8,9,13], a:0},
 {type:'mcq', q:'11 × 4 = ؟', opts:[47, 42, 44, 39], a:2},
 {type:'mcq', q:'3 × 10 = ؟', opts:[26, 30, 33, 36], a:1},
-{type:'mcq', q:'12 × 2 = ؟', opts:[24, 29, 28, 19], a:0},
-{type:'mcq', q:'5 × 12 = ؟', opts:[60, 62, 56, 65], a:0},
+{type:'mcq', q:'90 ÷ 9 = ؟', opts:[11,7,10,8], a:2},
+{type:'mcq', q:'22 ÷ 2 = ؟', opts:[8,13,9,11], a:3},
 {type:'mcq', q:'11 × 8 = ؟', opts:[92, 93, 88, 85], a:2},
-{type:'mcq', q:'3 × 11 = ؟', opts:[30, 37, 33, 39], a:2},
+{type:'mcq', q:'15 ÷ 5 = ؟', opts:[3,1,5,2], a:0},
 {type:'mcq', q:'2 × 2 = ؟', opts:[6, 7, 1, 4], a:3},
-{type:'mcq', q:'12 × 8 = ؟', opts:[98, 94, 96, 91], a:2},
+{type:'mcq', q:'44 ÷ 4 = ؟', opts:[12,11,9,13], a:1},
 {type:'mcq', q:'11 × 9 = ؟', opts:[94, 93, 99, 97], a:2},
 {type:'mcq', q:'7 × 4 = ؟', opts:[31, 30, 33, 28], a:3},
 {type:'mcq', q:'12 × 6 = ؟', opts:[67, 77, 72, 78], a:2},
 {type:'mcq', q:'6 × 11 = ؟', opts:[62, 66, 64, 60], a:1},
 {type:'mcq', q:'11 × 11 = ؟', opts:[127, 119, 115, 121], a:3},
-{type:'mcq', q:'10 × 3 = ؟', opts:[30, 32, 33, 36], a:0},
-{type:'mcq', q:'9 × 8 = ؟', opts:[72, 75, 76, 67], a:0},
-{type:'mcq', q:'10 × 5 = ؟', opts:[56, 55, 46, 50], a:3},
+{type:'mcq', q:'9 ÷ 3 = ؟', opts:[3,4,2,6], a:0},
+{type:'mcq', q:'24 ÷ 2 = ؟', opts:[9,15,12,13], a:2},
+{type:'mcq', q:'90 ÷ 10 = ؟', opts:[8,10,9,7], a:2},
 {type:'mcq', q:'4 × 5 = ؟', opts:[24, 20, 17, 22], a:1},
-{type:'mcq', q:'8 × 7 = ؟', opts:[51, 56, 59, 62], a:1},
-{type:'mcq', q:'11 × 6 = ؟', opts:[66, 63, 61, 60], a:0},
-{type:'mcq', q:'9 × 2 = ؟', opts:[13, 20, 18, 12], a:2},
-{type:'mcq', q:'7 × 11 = ؟', opts:[77, 81, 75, 71], a:0},
+{type:'mcq', q:'6 ÷ 3 = ؟', opts:[4,2,3,5], a:1},
+{type:'mcq', q:'16 ÷ 8 = ؟', opts:[1,3,2,5], a:2},
+{type:'mcq', q:'30 ÷ 6 = ؟', opts:[7,8,2,5], a:3},
+{type:'mcq', q:'4 ÷ 2 = ؟', opts:[4,2,5,3], a:1},
 ]},
 {id:'computer', name:'الكمبيوتر', icon:'💻', q:[
 {type:'mcq', q:'ما اختصار CPU؟', opts:['Central Process Unit','Central Processing Unit','Computer Processing Unit','Central Processor Use'], a:1},
@@ -1498,7 +1694,7 @@ const CATS = [
 {type:'mcq', q:'ما اسم النظام الثنائي المستخدم في الحاسوب؟', opts:['النظام العشري','النظام السداسي عشر','النظام الثنائي','نظام الأساس 8'], a:2},
 {type:'mcq', q:'ما هي الأرقام المستخدمة في النظام الثنائي؟', opts:['0 و 1','1 و 2','0 و 2','1 و 9'], a:0},
 {type:'mcq', q:'ما اسم أداة قياس سرعة الإنترنت؟', opts:['كيلوبايت','ميجابايت','ميجابت في الثانية (Mbps)','جيجاهرتز'], a:2},
-{type:'mcq', q:'ما الوسم المستخدم في HTML لجعل النص غامقًا (Bold)؟', opts:['<i>','<u>','<b>','<strong> أو <b>'], a:3},
+{type:'mcq', q:'ما الوسم المستخدم في HTML لجعل النص غامقًا (Bold)؟', opts:['<i>','<u>','<b>','<mark>'], a:2},
 {type:'mcq', q:'ما الوسم المستخدم في HTML لجعل النص مائلًا (Italic)؟', opts:['<b>','<i>','<u>','<s>'], a:1},
 {type:'mcq', q:'ما اسم الاختصار الذي يفتح نافذة "بحث" في معظم البرامج؟', opts:['Ctrl+H','Ctrl+F','Ctrl+B','Ctrl+G'], a:1},
 {type:'mcq', q:'ما اسم الاختصار الذي يُستخدم للتبديل بين النوافذ في Windows؟', opts:['Ctrl+Tab','Alt+Tab','Ctrl+Alt','Shift+Tab'], a:1},
@@ -1507,7 +1703,7 @@ const CATS = [
 {type:'mcq', q:'ما المقصود بـ "Cloud Computing"؟', opts:['برنامج للطقس','تخزين ومعالجة البيانات عبر الإنترنت','تبريد الحاسوب','نظام شبكي داخلي'], a:1},
 {type:'mcq', q:'ما اسم الفيروس الذي يُشفّر ملفاتك ويطلب فدية مالية؟', opts:['Trojan','Spyware','Ransomware','Adware'], a:2},
 {type:'mcq', q:'ما اسم الخاصية التي تحفظ نسخة من الملف تلقائيًا كل فترة في Word؟', opts:['AutoFormat','AutoSave','AutoCorrect','AutoFit'], a:1},
-{type:'mcq', q:'ما اسم قاعدة الحساب التي تُحدد أولويات العمليات الحسابية في Excel؟', opts:['PEMDAS/BODMAS','FIFO','LIFO','VLOOKUP'], a:0},
+{type:'mcq', q:'ما اسم الجهاز المستخدم للاتصال بالإنترنت في المنزل، وينقل الإشارة لاسلكيًا؟', opts:['الطابعة','الراوتر','الماسح الضوئي','السماعة'], a:1},
 {type:'mcq', q:'ما اسم دالة Excel للبحث عن قيمة في جدول؟', opts:['=IF()','=VLOOKUP()','=SUM()','=MATCH()'], a:1},
 {type:'mcq', q:'ما اختصار إعادة فعل ما تراجعت عنه؟', opts:['Ctrl+Z','Ctrl+Y','Ctrl+U','Ctrl+R'], a:1},
 {type:'mcq', q:'ما اسم لغة الاستعلام المستخدمة للتعامل مع قواعد البيانات؟', opts:['HTML','CSS','SQL','PHP'], a:2},
@@ -1518,7 +1714,7 @@ const CATS = [
 {type:'mcq', q:'ما الوسم المستخدم في HTML لإضافة سطر جديد (كسر السطر)؟', opts:['<p>','<div>','<br>','<nl>'], a:2},
 {type:'mcq', q:'ما خاصية HTML التي تُحدد الرابط في وسم الصورة؟', opts:['href','src','alt','link'], a:1},
 {type:'mcq', q:'ما خاصية HTML التي تُحدد النص البديل للصورة عند عدم تحميلها؟', opts:['src','href','alt','title'], a:2},
-{type:'mcq', q:'ما الوسم في HTML الذي يُنشئ الجدول وأي وسم يُعرّف صفًا فيه؟', opts:['table / tr','table / td','div / tr','section / row'], a:0},
+{type:'mcq', q:'ما الوسم المستخدم في HTML لإنشاء جدول؟', opts:['<table>','<grid>','<list>','<data>'], a:0},
 {type:'mcq', q:'ما الوسم في HTML الذي يُنشئ خلية بيانات داخل جدول؟', opts:['<tr>','<th>','<td>','<tc>'], a:2},
 {type:'mcq', q:'ما الوسم في HTML الذي يُنشئ خلية عنوان داخل جدول؟', opts:['<td>','<tr>','<th>','<head>'], a:2},
 {type:'mcq', q:'أين يُكتب CSS داخلي في صفحة HTML؟', opts:['داخل وسم body','داخل وسم head ضمن style','داخل وسم div','داخل وسم footer'], a:1},
@@ -1528,11 +1724,114 @@ const CATS = [
 {type:'mcq', q:'ما هي القيمة الصحيحة لتوسيط النص في CSS؟', opts:['text-align: justify','text-align: left','text-align: center','text-align: middle'], a:2},
 {type:'mcq', q:'أي دالة Excel تُعيد عدد الخلايا التي تحتوي على أرقام؟', opts:['=SUM()','=AVERAGE()','=COUNT()','=COUNTA()'], a:2},
 {type:'mcq', q:'أي دالة Excel تُعيد عدد كل الخلايا غير الفارغة؟', opts:['=COUNT()','=COUNTA()','=SUM()','=MAX()'], a:1},
-{type:'mcq', q:'ما الفرق بين المرجع المطلق والنسبي في Excel؟', opts:['لا فرق','المطلق ($A$1) لا يتغير عند نسخ الصيغة، النسبي (A1) يتغير','النسبي لا يتغير والمطلق يتغير','كلاهما يتغيران'], a:1},
+{type:'mcq', q:'ما الرمز المستخدم في Excel لبدء كتابة صيغة (معادلة)؟', opts:['#','$','=','@'], a:2},
 {type:'mcq', q:'ما معنى كلمة "Algorithm" في البرمجة؟', opts:['لغة برمجة','خطوات محددة لحل مشكلة','نوع من قواعد البيانات','برنامج مضاد للفيروسات'], a:1},
 {type:'mcq', q:'ما المقصود بـ"Debug" في البرمجة؟', opts:['كتابة الكود للمرة الأولى','إيجاد الأخطاء وإصلاحها في الكود','تشغيل البرنامج','طباعة النتائج'], a:1},
 {type:'mcq', q:'ما المقصود بـ"Loop" في البرمجة؟', opts:['دالة حسابية','تكرار تنفيذ مجموعة من الأوامر','نوع من المتغيرات','ملف برمجي'], a:1},
 ]},
+{id:'geography', name:'الجغرافيا', icon:'🌍', q:[
+{type:'mcq', q:'ما اسم أطول نهر في العالم؟', opts:['نهر الأمازون','نهر النيل','نهر المسيسيبي','نهر اليانغتسي'], a:1},
+{type:'mcq', q:'ما اسم أكبر قارة في العالم من حيث المساحة؟', opts:['أفريقيا','آسيا','أمريكا الشمالية','أوروبا'], a:1},
+{type:'mcq', q:'ما اسم أصغر قارة في العالم؟', opts:['أوروبا','أستراليا','أنتاركتيكا','أمريكا الجنوبية'], a:1},
+{type:'mcq', q:'ما عاصمة المملكة العربية السعودية؟', opts:['جدة','الرياض','مكة المكرمة','الدمام'], a:1},
+{type:'mcq', q:'ما عاصمة مصر؟', opts:['الإسكندرية','الجيزة','القاهرة','الأقصر'], a:2},
+{type:'mcq', q:'ما عاصمة فرنسا؟', opts:['مرسيليا','ليون','باريس','نيس'], a:2},
+{type:'mcq', q:'ما عاصمة اليابان؟', opts:['أوساكا','كيوتو','طوكيو','يوكوهاما'], a:2},
+{type:'mcq', q:'ما عاصمة إيطاليا؟', opts:['ميلانو','روما','نابولي','تورينو'], a:1},
+{type:'mcq', q:'ما عاصمة ألمانيا؟', opts:['ميونخ','هامبورغ','برلين','فرانكفورت'], a:2},
+{type:'mcq', q:'ما عاصمة بريطانيا؟', opts:['مانشستر','لندن','ليفربول','برمنغهام'], a:1},
+{type:'mcq', q:'ما عاصمة الإمارات العربية المتحدة؟', opts:['دبي','أبوظبي','الشارقة','العين'], a:1},
+{type:'mcq', q:'ما عاصمة الأردن؟', opts:['إربد','الزرقاء','عمّان','العقبة'], a:2},
+{type:'mcq', q:'ما عاصمة العراق؟', opts:['البصرة','الموصل','بغداد','أربيل'], a:2},
+{type:'mcq', q:'ما عاصمة المغرب؟', opts:['الدار البيضاء','الرباط','مراكش','فاس'], a:1},
+{type:'mcq', q:'ما عاصمة الجزائر؟', opts:['وهران','الجزائر العاصمة','قسنطينة','عنابة'], a:1},
+{type:'mcq', q:'ما عاصمة تونس؟', opts:['صفاقس','تونس العاصمة','سوسة','القيروان'], a:1},
+{type:'mcq', q:'ما اسم أعلى قمة جبلية في العالم؟', opts:['كليمنجارو','إيفرست','الألب','أنديز'], a:1},
+{type:'mcq', q:'في أي قارة يقع جبل إيفرست؟', opts:['أفريقيا','آسيا','أوروبا','أمريكا الجنوبية'], a:1},
+{type:'mcq', q:'ما اسم أكبر صحراء حارة في العالم؟', opts:['صحراء غوبي','الصحراء الكبرى','صحراء كالاهاري','صحراء أتاكاما'], a:1},
+{type:'mcq', q:'ما اسم أكبر محيط في العالم؟', opts:['الأطلسي','الهندي','الهادئ','المتجمد الشمالي'], a:2},
+{type:'mcq', q:'ما اسم أصغر محيط في العالم؟', opts:['الأطلسي','الهندي','الهادئ','المتجمد الشمالي'], a:3},
+{type:'mcq', q:'كم عدد قارات العالم؟', opts:['خمس','ست','سبع','ثمان'], a:2},
+{type:'mcq', q:'ما اسم أكبر جزيرة في العالم؟', opts:['مدغشقر','غرينلاند','بورنيو','سومطرة'], a:1},
+{type:'mcq', q:'ما اسم البحر الذي تطل عليه مصر من الشمال؟', opts:['البحر الأحمر','البحر المتوسط','الخليج العربي','بحر العرب'], a:1},
+{type:'mcq', q:'ما اسم البحر الذي تطل عليه مصر من الشرق؟', opts:['البحر المتوسط','البحر الأحمر','بحر قزوين','بحر إيجه'], a:1},
+{type:'mcq', q:'ما اسم أكبر بحيرة في العالم؟', opts:['بحيرة فيكتوريا','بحر قزوين','بحيرة سوبيريور','بحيرة بايكال'], a:1},
+{type:'mcq', q:'ما اسم أعمق بحيرة في العالم؟', opts:['بحيرة فيكتوريا','بحيرة بايكال','بحيرة تشاد','بحيرة ناصر'], a:1},
+{type:'mcq', q:'ما اسم القارة التي تقع فيها مصر؟', opts:['آسيا','أفريقيا','أوروبا','أمريكا'], a:1},
+{type:'mcq', q:'ما اسم الدولة المعروفة بـ\'أرض الفراعنة\'؟', opts:['السودان','مصر','ليبيا','تونس'], a:1},
+{type:'mcq', q:'ما اسم الدولة الأكبر مساحة في العالم؟', opts:['الصين','كندا','روسيا','الولايات المتحدة'], a:2},
+{type:'mcq', q:'ما اسم الدولة الأكثر سكانًا في العالم؟', opts:['الهند','الصين','إندونيسيا','الولايات المتحدة'], a:0},
+{type:'mcq', q:'ما اسم الدولة المكوّنة من آلاف الجزر في جنوب شرق آسيا؟', opts:['الفلبين','إندونيسيا','ماليزيا','تايلاند'], a:1},
+{type:'mcq', q:'أي دولة تشتهر ببرج إيفل؟', opts:['إيطاليا','إسبانيا','فرنسا','ألمانيا'], a:2},
+{type:'mcq', q:'أي دولة تشتهر بتمثال الحرية؟', opts:['كندا','الولايات المتحدة','بريطانيا','أستراليا'], a:1},
+{type:'mcq', q:'أي دولة تشتهر بسور الصين العظيم؟', opts:['اليابان','كوريا الجنوبية','الصين','فيتنام'], a:2},
+{type:'mcq', q:'أي دولة تشتهر بالبيتزا والمعكرونة؟', opts:['إسبانيا','اليونان','إيطاليا','فرنسا'], a:2},
+{type:'mcq', q:'أي دولة تشتهر ببرج بيزا المائل؟', opts:['فرنسا','إيطاليا','إسبانيا','سويسرا'], a:1},
+{type:'mcq', q:'أي دولة تشتهر بالأهرامات وأبو الهول؟', opts:['السودان','مصر','المغرب','الأردن'], a:1},
+{type:'mcq', q:'أي دولة تشتهر بالبتراء المنحوتة في الصخر؟', opts:['سوريا','لبنان','الأردن','فلسطين'], a:2},
+{type:'mcq', q:'أي دولة تشتهر بتاج محل؟', opts:['باكستان','الهند','بنغلاديش','نيبال'], a:1},
+{type:'mcq', q:'ما اسم أكبر مدينة من حيث عدد السكان في العالم؟', opts:['نيويورك','طوكيو','القاهرة','لندن'], a:1},
+{type:'mcq', q:'ما اسم النهر الذي يمر بمدينة بغداد؟', opts:['الفرات','دجلة','النيل','الأردن'], a:1},
+{type:'mcq', q:'ما اسم النهر الذي يمر بمدينة القاهرة؟', opts:['دجلة','الفرات','النيل','الأمازون'], a:2},
+{type:'mcq', q:'ما اسم المضيق الذي يفصل قارة آسيا عن قارة أوروبا؟', opts:['مضيق جبل طارق','مضيق البسفور','مضيق هرمز','مضيق ملقا'], a:1},
+{type:'mcq', q:'ما اسم المضيق الذي يربط البحر الأحمر بالمحيط الهندي؟', opts:['مضيق هرمز','مضيق باب المندب','مضيق البسفور','مضيق ملقا'], a:1},
+{type:'mcq', q:'ما اسم القناة التي تربط البحر الأبيض المتوسط بالبحر الأحمر؟', opts:['قناة بنما','قناة السويس','قناة كورنث','قناة كيل'], a:1},
+{type:'mcq', q:'ما اسم القناة التي تربط المحيط الأطلسي بالمحيط الهادئ؟', opts:['قناة السويس','قناة بنما','قناة كيل','قناة كورنث'], a:1},
+{type:'mcq', q:'في أي قارة تقع الصحراء الكبرى؟', opts:['آسيا','أفريقيا','أستراليا','أمريكا الجنوبية'], a:1},
+{type:'mcq', q:'ما اسم الدولة التي تحيط بإيطاليا وتُعد دولة داخل مدينة روما؟', opts:['سان مارينو','الفاتيكان','موناكو','أندورا'], a:1},
+{type:'mcq', q:'ما اسم أصغر دولة في العالم من حيث المساحة؟', opts:['موناكو','الفاتيكان','سنغافورة','مالطا'], a:1},
+{type:'mcq', q:'ما اسم الدولة المعروفة بأرض الشمس المشرقة؟', opts:['الصين','كوريا الجنوبية','اليابان','تايلاند'], a:2},
+{type:'mcq', q:'ما اسم الدولة التي يقع فيها برج خليفة أطول برج في العالم؟', opts:['السعودية','قطر','الإمارات','الكويت'], a:2},
+{type:'mcq', q:'في أي مدينة يقع برج خليفة؟', opts:['أبوظبي','دبي','الشارقة','الدوحة'], a:1},
+{type:'mcq', q:'ما اسم جبال تقع في أمريكا الجنوبية وتُعد أطول سلسلة جبلية في العالم؟', opts:['جبال الألب','جبال الأنديز','جبال روكي','جبال الهيمالايا'], a:1},
+{type:'mcq', q:'ما اسم السلسلة الجبلية التي تضم جبل إيفرست؟', opts:['الأنديز','الألب','الهيمالايا','روكي'], a:2},
+{type:'mcq', q:'ما اسم القارة التي تقع فيها غابات الأمازون المطيرة؟', opts:['أفريقيا','أمريكا الجنوبية','آسيا','أستراليا'], a:1},
+{type:'mcq', q:'ما اسم الدولة التي يقع فيها معظم غابات الأمازون؟', opts:['كولومبيا','البرازيل','بيرو','الأرجنتين'], a:1},
+{type:'mcq', q:'ما اسم خط الطول الذي يُعد نقطة الصفر لتحديد المناطق الزمنية؟', opts:['خط الاستواء','خط غرينتش','مدار السرطان','مدار الجدي'], a:1},
+{type:'mcq', q:'ما اسم الخط الوهمي الذي يقسم الأرض إلى نصفين شمالي وجنوبي؟', opts:['خط غرينتش','خط الاستواء','مدار السرطان','القطب الشمالي'], a:1},
+{type:'mcq', q:'ما اسم القارة التي لا يوجد بها سكان أصليون دائمون؟', opts:['أستراليا','أنتاركتيكا','أوروبا','آسيا'], a:1},
+{type:'mcq', q:'ما اسم أكبر شبه جزيرة في العالم؟', opts:['شبه جزيرة سيناء','شبه الجزيرة العربية','شبه جزيرة كوريا','شبه جزيرة إيطاليا'], a:1},
+{type:'mcq', q:'في أي قارة تقع شبه الجزيرة العربية؟', opts:['أفريقيا','آسيا','أوروبا','أستراليا'], a:1},
+{type:'mcq', q:'ما اسم الدولة التي تُعرف بأرض الألف بحيرة؟', opts:['السويد','فنلندا','النرويج','الدنمارك'], a:1},
+{type:'mcq', q:'ما اسم الدولة الاسكندنافية المعروفة بالفايكنج؟', opts:['فنلندا','النرويج','بولندا','هولندا'], a:1},
+{type:'mcq', q:'ما اسم أشهر برج مائل في أوروبا؟', opts:['برج إيفل','برج بيزا','برج لندن','برج بيج بن'], a:1},
+{type:'mcq', q:'ما اسم الساعة الشهيرة في لندن؟', opts:['ساعة الحائط','بيج بن','ساعة غرينتش','برج الساعة'], a:1},
+{type:'mcq', q:'ما اسم أشهر متحف في باريس يضم لوحة الموناليزا؟', opts:['متحف اللوفر','متحف أورسيه','متحف بومبيدو','قصر فرساي'], a:0},
+{type:'mcq', q:'ما اسم النهر الذي يمر بمدينة لندن؟', opts:['السين','التايمز','الراين','الدانوب'], a:1},
+{type:'mcq', q:'ما اسم النهر الذي يمر بمدينة باريس؟', opts:['التايمز','السين','الراين','الدانوب'], a:1},
+{type:'mcq', q:'ما اسم أكبر دولة في قارة أفريقيا من حيث المساحة؟', opts:['مصر','الجزائر','السودان','ليبيا'], a:1},
+{type:'mcq', q:'ما اسم أكبر دولة عربية من حيث عدد السكان؟', opts:['السعودية','مصر','العراق','الجزائر'], a:1},
+{type:'mcq', q:'ما اسم الدولة العربية الوحيدة التي تقع في قارتين؟', opts:['السعودية','مصر','الأردن','سوريا'], a:1},
+{type:'mcq', q:'ما اسم مضيق جبل طارق الذي يفصل بين أوروبا وأفريقيا؟', opts:['مضيق هرمز','مضيق جبل طارق','مضيق البسفور','مضيق ملقا'], a:1},
+{type:'mcq', q:'ما اسم الدولتين اللتين يفصل بينهما مضيق جبل طارق؟', opts:['إسبانيا والمغرب','فرنسا والجزائر','إيطاليا وتونس','اليونان وليبيا'], a:0},
+{type:'mcq', q:'ما اسم أكبر مدينة ساحلية في مصر؟', opts:['بورسعيد','الإسكندرية','السويس','دمياط'], a:1},
+{type:'mcq', q:'ما اسم شبه الجزيرة المصرية التي تضم شرم الشيخ؟', opts:['سيناء','الصحراء الغربية','الصحراء الشرقية','الدلتا'], a:0},
+{type:'mcq', q:'ما اسم أطول سلسلة جبال في قارة أفريقيا؟', opts:['جبال الأطلس','جبال درا كنسبرغ','جبال روينزوري','جبال إثيوبيا'], a:0},
+{type:'mcq', q:'في أي دولة تقع جبال الأطلس بشكل رئيسي؟', opts:['مصر','المغرب','ليبيا','تونس'], a:1},
+{type:'mcq', q:'ما اسم أعلى قمة جبلية في قارة أفريقيا؟', opts:['جبل كينيا','جبل كليمنجارو','جبل الأطلس','جبل توبكال'], a:1},
+{type:'mcq', q:'في أي دولة يقع جبل كليمنجارو؟', opts:['كينيا','تنزانيا','أوغندا','إثيوبيا'], a:1},
+{type:'mcq', q:'ما اسم أشهر شلالات في العالم تقع بين أمريكا وكندا؟', opts:['شلالات فيكتوريا','شلالات نياغرا','شلالات إجوازو','شلالات أنجل'], a:1},
+{type:'mcq', q:'ما اسم أعلى شلال في العالم ويقع في فنزويلا؟', opts:['شلالات نياغرا','شلالات أنجل','شلالات فيكتوريا','شلالات إجوازو'], a:1},
+{type:'mcq', q:'ما اسم الدولة التي تقع فيها شلالات فيكتوريا؟', opts:['بين زامبيا وزيمبابوي','بين كينيا وتنزانيا','بين مصر والسودان','بين المغرب والجزائر'], a:0},
+{type:'mcq', q:'ما اسم البحر الميت الذي يُعد أخفض نقطة على سطح الأرض؟', opts:['بحر قزوين','البحر الميت','البحر الأحمر','بحيرة ناصر'], a:1},
+{type:'mcq', q:'بين أي دولتين يقع البحر الميت؟', opts:['مصر والسودان','الأردن وفلسطين','السعودية واليمن','سوريا ولبنان'], a:1},
+{type:'mcq', q:'ما اسم أكبر واحة في الصحراء الغربية المصرية؟', opts:['واحة سيوة','واحة الخارجة','واحة الداخلة','واحة الفرافرة'], a:1},
+{type:'mcq', q:'ما اسم بحيرة صناعية ضخمة تقع جنوب مصر؟', opts:['بحيرة قارون','بحيرة ناصر','بحيرة البردويل','بحيرة المنزلة'], a:1},
+{type:'mcq', q:'ما اسم السد الذي أنشئ على نهر النيل جنوب مصر؟', opts:['السد العالي','سد أسيوط','سد إسنا','سد النهضة'], a:0},
+{type:'mcq', q:'ما اسم أكبر قارة من حيث عدد السكان؟', opts:['أفريقيا','آسيا','أوروبا','أمريكا الشمالية'], a:1},
+{type:'mcq', q:'ما اسم أكبر دولة في قارة أوروبا من حيث المساحة؟', opts:['فرنسا','روسيا (الجزء الأوروبي)','أوكرانيا','إسبانيا'], a:1},
+{type:'mcq', q:'ما اسم الدولة التي تحتوي على أكبر عدد من الأهرامات في العالم؟', opts:['مصر','المكسيك','السودان','بيرو'], a:2},
+{type:'mcq', q:'ما اسم الدولة التي تشتهر بأهرامات المايا؟', opts:['البرازيل','المكسيك','الأرجنتين','بيرو'], a:1},
+{type:'mcq', q:'ما اسم حضارة الإنكا التي اشتهرت ببناء ماتشو بيتشو؟', opts:['بيرو','تشيلي','الأكوادور','بوليفيا'], a:0},
+{type:'mcq', q:'ما اسم الدولة الإفريقية التي تضم أكبر عدد من الحيوانات البرية في محمياتها الشهيرة؟', opts:['مصر','كينيا','المغرب','الجزائر'], a:1},
+{type:'mcq', q:'ما اسم أشهر سهل عشبي إفريقي يضم الحيوانات البرية؟', opts:['السرنجتي','الأمازون','الصحراء الكبرى','دلتا النيل'], a:0},
+{type:'mcq', q:'ما اسم الدولة التي يمر بها خط الاستواء وتقع في وسط أفريقيا وتحمل نفس اسمه؟', opts:['كينيا','الإكوادور','الكونغو','تنزانيا'], a:1},
+{type:'mcq', q:'ما اسم القارة التي تضم أكبر عدد من الدول في العالم؟', opts:['آسيا','أفريقيا','أوروبا','أمريكا الجنوبية'], a:1},
+{type:'mcq', q:'ما اسم الدولة العربية التي لا تطل على أي بحر أو محيط؟', opts:['الأردن','العراق','سوريا','لا توجد دولة عربية حبيسة تمامًا'], a:3},
+{type:'mcq', q:'ما اسم الدولة التي تفصلها جبال البرانس عن فرنسا؟', opts:['البرتغال','إسبانيا','إيطاليا','سويسرا'], a:1},
+{type:'mcq', q:'ما اسم الدولة الأوروبية المعروفة بطواحين الهواء والزهور؟', opts:['بلجيكا','هولندا','الدنمارك','النمسا'], a:1},
+]},
+
 ];
 
 const TASKS = [
@@ -1636,10 +1935,6 @@ const TASKS = [
   {title:'Python: قراءة الملفات', desc:'اكتب برنامج يفتح ملفًا نصيًا ويطبع محتواه ثم يكتب بيانات فيه.'},
   {title:'Scratch: الحركة الأولى', desc:'افتح scratch.mit.edu وأنشئ مشروعًا يتحرك الكائن بالأسهم.'},
   {title:'Scratch: قصة متحركة', desc:'أنشئ قصة من 3 مشاهد مع كائنات تتحرك وتتبادل الحوار.'},
-  {title:'Canva: بوستر مدرسي', desc:'افتح canva.com وأنشئ بوسترًا A4 لحدث مدرسي بصور وألوان.'},
-  {title:'Canva: بطاقة عمل', desc:'صمّم بطاقة عمل لنفسك بشعار ومعلومات تواصل وتصميم احترافي.'},
-  {title:'Google Calendar: جدولة', desc:'نظّم جدولك الأسبوعي في Google Calendar وضبط تذكيرات للمهام.'},
-  {title:'مهارة: التحقق من المعلومات', desc:'ابحث عن خبر في 3 مصادر مختلفة وقارن لتحديد صحته قبل نشره.'},
 ];
 
 const SPORTS = [
@@ -1730,7 +2025,7 @@ function lockPremium(){
   localStorage.removeItem('rmy_premium');
   localStorage.removeItem('rmy_expiry');
   closeAbout();buildHome();
-  setTimeout(()=>alert('🔒 تم قفل النسخة الكاملة.'),200);
+  setTimeout(()=>showToast('🔒 تم قفل النسخة الكاملة.'),200);
 }
 function closeAbout(){ document.getElementById('aboutOverlay').classList.add('hidden'); }
 
@@ -1782,6 +2077,24 @@ function copyDeviceCode(){
   });
 }
 
+function copyDeviceMessage(){
+  const code = document.getElementById('deviceCode').textContent;
+  const msg = 'السلام عليكم،\nأريد تفعيل النسخة الكاملة من تطبيق رحلة المعرفة اليومية.\n\nرمز الجهاز:\n'+code+'\n\nشكراً لكم.';
+  navigator.clipboard.writeText(msg).then(()=>{
+    showToast('📋 تم نسخ الرسالة — الصقها في إنستاجرام');
+  }).catch(()=>{
+    const ta = document.createElement('textarea');
+    ta.value = msg;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('📋 تم نسخ الرسالة — الصقها في إنستاجرام');
+  });
+}
+
 function pasteActivCode(){
   const inp = document.getElementById('activInput');
   navigator.clipboard.readText().then(text=>{
@@ -1824,11 +2137,25 @@ function checkActiv(){
     isPremium=true;
     closeActiv();buildHome();
     const expiryStr=days>=9999?'دائم ♾️':new Date(expiry).toLocaleDateString('ar-EG');
-    setTimeout(()=>alert('🎉 تم التفعيل! صالح حتى: '+expiryStr),200);
+    setTimeout(()=>showToast('🎉 تم التفعيل! صالح حتى: '+expiryStr),200);
   }else{
     if(msg){msg.style.color='var(--coral)';msg.textContent='❌ كود خاطئ — تواصل مع المطور';}
     document.getElementById('activInput').style.borderColor='var(--coral)';
   }
+}
+
+/* ── TOAST ── */
+function showHowTo(){ closeUpgrade(); document.getElementById('howToOv').classList.remove('hidden'); }
+function closeHowTo(){ document.getElementById('howToOv').classList.add('hidden'); }
+
+function showToast(msg, duration){
+  duration = duration || 3000;
+  const t = document.getElementById('toastMsg');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), duration);
 }
 
 /* ── AUDIO ── */
@@ -1892,13 +2219,14 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 
 /* ── HOME ── */
 function buildHome(){
+  updateFamilyQBadge();
   const ch=getChild(),cn=document.getElementById('cname');
   if(cn){cn.textContent=ch.name?(ch.gender==='f'?'👧 ':'👦 ')+ch.name:'';cn.style.display=ch.name?'inline-block':'none';}
   const pb=document.getElementById('premBtn');if(pb)pb.style.display=isPremium?'none':'inline-block';
   const grid=document.getElementById('categoryGrid');grid.innerHTML='';
   CATS.forEach(cat=>{
     const free=FREE_CATS.includes(cat.id),locked=!free&&!isPremium;
-    const prog=getCP(cat.id),pct=prog.best?Math.round((prog.best/FREE_Q)*100):0;
+    const prog=getCP(cat.id),totalQ=cat.q.length,pct=prog.best?Math.round((prog.best/totalQ)*100):0;
     const div=document.createElement('div');
     div.className='card'+(prog.done?' done':'');div.id='card-'+cat.id;
     div.onclick=()=>locked?showUpgr():startCat(cat.id);
@@ -1924,6 +2252,7 @@ function goHome(){hideAll();document.getElementById('home').classList.remove('hi
 /* ── CHILD SELECTION ── */
 var _editIdx=-1,_editGender='m',_gender='';
 function showCSel(){
+  checkDyk();
   const list=document.getElementById('clist');list.innerHTML='';
   children.forEach((ch,i)=>{
     const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:9px;';
@@ -1948,7 +2277,7 @@ function selectGender(g){
 function saveName(){
   const val=(document.getElementById('nIn').value||'').trim();
   if(!val){document.getElementById('nIn').style.borderColor='var(--coral)';return;}
-  if(!_gender){alert('اختر ولد أو بنت أولاً');return;}
+  if(!_gender){showToast('⚠️ اختر ولد أو بنت أولاً');return;}
   document.getElementById('nIn').value='';document.getElementById('nIn').style.borderColor='';
   document.getElementById('nameOv').classList.add('hidden');
   addChild(val,_gender);_gender='';
@@ -2081,6 +2410,7 @@ function finishSess(){
   document.getElementById('summaryTitle').textContent=t2;
   document.getElementById('summaryText').textContent='حصلت على '+session.score+' من '+session.questions.length+' ('+pct+'%) — نقاطك اليوم: '+(getChild().score||0)+' ⭐';
   if(session.mode==='cat'){const p=getCP(session.catId);setCP(session.catId,{best:Math.max(p.best||0,session.score),done:true});}
+  finishSessExtra();
 }
 
 /* ── TASKS ── */
@@ -2173,6 +2503,1273 @@ function showUpgrade(){showUpgr();}
 function closeUpgrade(){closeUpgr();}
 function startDailyExam(){handleDaily();}
 function updateTotalScoreUI(){updateScoreUI();}
+
+
+/* ── DID YOU KNOW ── */
+const DYK_FACTS = [
+  'أركان الإسلام خمسة: الشهادتان والصلاة والزكاة والصوم والحج.',
+  'القرآن الكريم يتكون من 114 سورة و6236 آية.',
+  'أول سورة نزلت من القرآن هي سورة العلق.',
+  'آخر سورة نزلت كاملة هي سورة النصر.',
+  'النبي محمد ﷺ وُلد في مكة المكرمة عام 570م.',
+  'الهجرة النبوية كانت عام 622م وهو بداية التقويم الهجري.',
+  'المسجد الحرام في مكة المكرمة هو أقدس مكان في الإسلام.',
+  'المسجد النبوي في المدينة المنورة بناه النبي ﷺ بعد الهجرة.',
+  'المسجد الأقصى في القدس ثالث أقدس مكان في الإسلام.',
+  'صلاة الفجر ركعتان وصلاة الظهر أربع وصلاة العصر أربع.',
+  'صلاة المغرب ثلاث ركعات وصلاة العشاء أربع ركعات.',
+  'الزكاة تجب على من يملك النصاب وهو ما يعادل 85 جراماً من الذهب.',
+  'رمضان هو الشهر التاسع في التقويم الهجري.',
+  'ليلة القدر خير من ألف شهر وتكون في العشر الأواخر من رمضان.',
+  'الحج فريضة على كل مسلم مستطيع مرة في العمر.',
+  'الكعبة المشرفة شكلها مكعب وارتفاعها 13 متراً تقريباً.',
+  'الحجر الأسود موجود في الركن الجنوبي الشرقي من الكعبة.',
+  'زمزم بئر مقدسة في المسجد الحرام ظهرت لهاجر وابنها إسماعيل.',
+  'النبي إبراهيم ﷺ يُلقب بخليل الله وأبي الأنبياء.',
+  'النبي موسى ﷺ كلّمه الله تعالى مباشرة ويُلقب بكليم الله.',
+  'النبي عيسى ﷺ وُلد من غير أب بمعجزة إلهية.',
+  'الملائكة مخلوقات من نور لا تعصي الله ما أمرهم.',
+  'جبريل ﷺ هو الملك الموكّل بالوحي.',
+  'ميكائيل ﷺ هو الملك الموكّل بالأمطار والنبات.',
+  'إسرافيل ﷺ هو الملك الموكّل بنفخ الصور يوم القيامة.',
+  'الصدقة الجارية تنفع الإنسان بعد موته.',
+  'طلب العلم فريضة على كل مسلم ومسلمة.',
+  'الصبر نصف الإيمان والشكر نصفه الآخر.',
+  'من أسماء الله الحسنى: الرحمن الرحيم الملك القدوس السلام.',
+  'القرآن الكريم محفوظ بحفظ الله منذ نزوله حتى قيام الساعة.',
+  'السنة النبوية هي المصدر الثاني للتشريع الإسلامي بعد القرآن.',
+  'الإجماع والقياس مصدران من مصادر الفقه الإسلامي.',
+  'المذاهب الفقهية الأربعة: الحنفي والمالكي والشافعي والحنبلي.',
+  'الإمام أبو حنيفة مؤسس المذهب الحنفي وُلد في الكوفة.',
+  'الإمام مالك صاحب كتاب الموطأ وُلد في المدينة المنورة.',
+  'الإمام الشافعي صاحب كتاب الأم من أصول قريش.',
+  'الإمام أحمد بن حنبل صاحب المسند عُذِّب ولم يتخلَّ عن معتقده.',
+  'صحيح البخاري يُعدّ أصح كتاب بعد القرآن الكريم.',
+  'البسملة هي: بسم الله الرحمن الرحيم وتُقال قبل كل عمل.',
+  'آية الكرسي هي أعظم آية في القرآن الكريم.',
+  'سورة الإخلاص تعدل ثلث القرآن لأنها تصف صفات الله.',
+  'سورة الفاتحة تُسمى أم الكتاب وأم القرآن والسبع المثاني.',
+  'أطول سورة في القرآن هي سورة البقرة وأقصرها سورة الكوثر.',
+  'الاستغفار يمحو الذنوب ويفتح أبواب الرزق والرحمة.',
+  'الدعاء سلاح المؤمن وأفضله ما كان في جوف الليل.',
+  'صلة الرحم تزيد في الرزق وتطيل العمر.',
+  'الصدق منجاة والكذب هلكة.',
+  'التواضع صفة المؤمن والكبر صفة المنافق.',
+  'الأمانة أساس الدين والمعاملات في الإسلام.',
+  'الغيبة حرام وهي ذكر المسلم بما يكره في غيابه.',
+  'النميمة من كبائر الذنوب وتُفسد العلاقات.',
+  'حسن الخلق من أثقل ما يوضع في الميزان يوم القيامة.',
+  'بر الوالدين من أعظم القربات إلى الله تعالى.',
+  'عقوق الوالدين من الكبائر التي توعّد الله عليها بالعذاب.',
+  'الجار له حق عظيم في الإسلام حتى ظنّ النبي ﷺ أنه سيرثه.',
+  'اليتيم له مكانة خاصة في الإسلام والنبي ﷺ كان يتيماً.',
+  'الرفق بالحيوان من الإسلام وقد دخلت امرأة الجنة بسبب هرة.',
+  'من أطعم جائعاً أو كسا عارياً أو سقى عطشاناً فكأنما فعلها للنبي ﷺ.',
+  'الوضوء شرط لصحة الصلاة وتجديده نعمة وطهارة.',
+  'التيمم بديل عن الوضوء والغسل عند انعدام الماء أو تعذّر استخدامه.',
+  'صلاة الجماعة أفضل من صلاة الفرد بسبع وعشرين درجة.',
+  'الأذان شعار الإسلام وهو نداء الله للمؤمنين للصلاة.',
+  'الإقامة تُقال مباشرة قبل بدء الصلاة.',
+  'الجمعة يوم عيد المسلمين الأسبوعي وصلاتها فريضة على الرجال.',
+  'خطبة الجمعة شرط لصحة صلاة الجمعة.',
+  'عيد الفطر يأتي بعد انتهاء شهر رمضان.',
+  'عيد الأضحى يأتي في العاشر من ذي الحجة.',
+  'الأضحية سنة مؤكدة في عيد الأضحى.',
+  'زكاة الفطر واجبة على كل مسلم قبل صلاة عيد الفطر.',
+  'سورة يس تُقرأ على المحتضرين وفي المقابر.',
+  'حفظ القرآن الكريم يرفع صاحبه في الدنيا والآخرة.',
+  'القرآن شفاء للأجساد والقلوب والأرواح.',
+  'السجود لله لحظة القرب الأعظم من العبد إلى ربه.',
+  'قيام الليل كان فريضة ثم صار سنة مؤكدة.',
+  'صلاة الضحى من النوافل التي يحبها الله وتُصلى بعد شروق الشمس.',
+  'صيام الاثنين والخميس سنة نبوية.',
+  'صيام ست أيام من شوال مع رمضان كصيام الدهر كله.',
+  'صيام يوم عرفة يُكفّر ذنوب سنتين ماضية ومقبلة.',
+  'صيام عاشوراء يكفر ذنوب سنة ماضية.',
+  'الذكر بعد الصلوات سنة نبوية تطرد الشيطان وتجلب الرحمة.',
+  'التسبيح والتحميد والتكبير كل منها بثلاث وثلاثين يُكمّل مئة.',
+  'حسبنا الله ونعم الوكيل تُقال عند الكرب والضيق.',
+  'لا حول ولا قوة إلا بالله كنز من كنوز الجنة.',
+  'سبحان الله وبحمده مئة مرة تمحو الذنوب ولو كانت كالزبد.',
+  'الله أكبر كلمة التعظيم التي تُقال في الأذان والصلاة والشدائد.',
+  'الحمد لله على كل حال فريضة الشاكرين وديدن الصالحين.',
+  'رب اغفر لي ولوالديَّ دعاء النبي إبراهيم ﷺ في القرآن.',
+  'ربنا آتنا في الدنيا حسنة وفي الآخرة حسنة دعاء جامع.',
+  'اللهم إنك عفو تحب العفو فاعفُ عني دعاء ليلة القدر.',
+  'من قرأ آية الكرسي بعد كل صلاة لم يمنعه من دخول الجنة إلا الموت.',
+  'المعوذتان قُل أعوذ برب الفلق والناس أفضل الأدعية للاستعاذة.',
+  'مصر من أقدم الحضارات في التاريخ وتمتد لأكثر من 7000 سنة.',
+  'الفراعنة حكموا مصر لما يزيد على 3000 سنة.',
+  'الهرم الأكبر بناه الفرعون خوفو ويُعد من عجائب الدنيا السبع القديمة.',
+  'أبو الهول تمثال ضخم بجسم أسد ورأس إنسان يحرس أهرامات الجيزة.',
+  'الملكة حتشبسوت أعظم ملكة في تاريخ مصر القديمة وحكمت كفرعون.',
+  'رمسيس الثاني أطول الفراعنة حكماً وأكثرهم معارك وإنجازات.',
+  'معركة قادش كانت بين رمسيس الثاني والحيثيين وانتهت بأول معاهدة سلام.',
+  'تحتمس الثالث فتح معظم بلاد الشام ويُعدّ نابليون مصر القديمة.',
+  'أمنحتب الرابع (إخناتون) أول من دعا للتوحيد في التاريخ القديم.',
+  'الملكة كليوباترا كانت تتكلم 9 لغات وهي آخر فراعنة مصر.',
+  'الحضارة الرومانية قامت على ضفاف نهر التيبر في إيطاليا.',
+  'الإسكندر الأكبر بنى إمبراطورية امتدت من اليونان حتى الهند.',
+  'مدينة الإسكندرية أسسها الإسكندر الأكبر عام 331 ق.م.',
+  'مكتبة الإسكندرية القديمة كانت أكبر مكتبة في العالم القديم.',
+  'الحضارة الإغريقية أسست الديمقراطية والفلسفة والرياضيات.',
+  'سقراط وأفلاطون وأرسطو ثالوث الفلسفة الإغريقية الخالد.',
+  'الإمبراطورية العثمانية استمرت أكثر من 600 سنة حتى 1923م.',
+  'الفتح الإسلامي لمصر تم عام 640م على يد عمرو بن العاص.',
+  'صلاح الدين الأيوبي حرر القدس من الصليبيين عام 1187م.',
+  'معركة حطين كانت النصر الحاسم لصلاح الدين على الصليبيين.',
+  'الحروب الصليبية استمرت قرنين من الزمان (1096-1291م).',
+  'القاهرة أسسها المعز لدين الله الفاطمي عام 969م.',
+  'الأزهر الشريف أُسس عام 970م وهو أقدم جامعة في العالم.',
+  'محمد علي باشا مؤسس مصر الحديثة حكم من 1805 إلى 1848م.',
+  'الثورة العرابية عام 1882م كانت أول ثورة شعبية في مصر الحديثة.',
+  'ثورة 1919م قادها سعد زغلول ضد الاحتلال البريطاني.',
+  'قناة السويس افتُتحت عام 1869م في عهد الخديوي إسماعيل.',
+  'تأميم قناة السويس أعلنه الرئيس جمال عبد الناصر عام 1956م.',
+  'ثورة يوليو 1952م أطاحت بالملك فاروق وأسست الجمهورية.',
+  'معركة العلمين 1942م كانت نقطة التحول في الحرب العالمية الثانية.',
+  'حرب أكتوبر 1973م انتصر فيها الجيش المصري وعبر قناة السويس.',
+  'اتفاقية كامب ديفيد عام 1978م أنهت الصراع المصري الإسرائيلي.',
+  'الحرب العالمية الأولى (1914-1918م) راح ضحيتها 17 مليون شخص.',
+  'الحرب العالمية الثانية (1939-1945م) كانت الأشد دماراً في التاريخ.',
+  'هتلر مؤسس الحزب النازي أشعل الحرب العالمية الثانية.',
+  'المحرقة النازية أودت بحياة 6 ملايين يهودي.',
+  'نابليون بونابرت قائد فرنسي غزا مصر عام 1798م.',
+  'الثورة الفرنسية 1789م أسقطت الملكية وأعلنت الجمهورية.',
+  'كريستوفر كولومبس اكتشف أمريكا عام 1492م.',
+  'مجلس الأمن أُسس بعد الحرب العالمية الثانية عام 1945م.',
+  'الأمم المتحدة تأسست عام 1945م لحفظ السلام الدولي.',
+  'الثورة الصناعية بدأت في إنجلترا في القرن الثامن عشر.',
+  'المغول دمروا بغداد عام 1258م وأسقطوا الخلافة العباسية.',
+  'الخلافة الراشدة امتدت من 632 إلى 661م.',
+  'الخلافة الأموية امتدت من 661 إلى 750م عاصمتها دمشق.',
+  'الخلافة العباسية امتدت من 750م إلى 1258م عاصمتها بغداد.',
+  'بيت الحكمة في بغداد كان مركزاً عالمياً للعلوم والترجمة.',
+  'ابن بطوطة رحالة مغربي جاب العالم وكتب كتاب رحلاته.',
+  'ماركو بولو رحالة إيطالي وصف رحلاته إلى الصين وآسيا.',
+  'الحضارة الإسلامية في الأندلس استمرت قرابة 800 سنة.',
+  'فتح الأندلس تم عام 711م على يد طارق بن زياد.',
+  'معركة بلاط الشهداء 732م أوقفت الزحف الإسلامي في أوروبا.',
+  'ابن رشد فيلسوف أندلسي أثّر تأثيراً كبيراً في أوروبا.',
+  'موسى بن نصير وطارق بن زياد قادا فتح شمال أفريقيا.',
+  'الدولة السعودية الأولى تأسست عام 1744م.',
+  'المملكة العربية السعودية تأسست عام 1932م على يد الملك عبد العزيز.',
+  'النفط اكتُشف في السعودية عام 1938م وغيّر وجه المنطقة.',
+  'الكويت حصلت على استقلالها عام 1961م.',
+  'الإمارات العربية المتحدة تأسست عام 1971م.',
+  'الثورة الإيرانية أطاحت بالشاه عام 1979م.',
+  'حرب الخليج الأولى 1991م حررت الكويت من الغزو العراقي.',
+  'بناء جدار برلين 1961م وسقوطه 1989م رمز الحرب الباردة.',
+  'الحرب الباردة كانت بين الولايات المتحدة والاتحاد السوفيتي.',
+  'سقوط الاتحاد السوفيتي عام 1991م نهاية لحقبة الحرب الباردة.',
+  'أول قنبلة ذرية أُلقيت على هيروشيما اليابانية 6 أغسطس 1945م.',
+  'الهند حصلت على استقلالها من بريطانيا عام 1947م.',
+  'المهاتما غاندي قاد نضال الهند للاستقلال بالمقاومة السلمية.',
+  'نيلسون مانديلا قضى 27 سنة في السجن ثم أصبح رئيساً لجنوب أفريقيا.',
+  'مارتن لوثر كينج قاد حركة الحقوق المدنية للسود في أمريكا.',
+  'جورج واشنطن أول رئيس للولايات المتحدة الأمريكية.',
+  'إعلان استقلال أمريكا كان في 4 يوليو 1776م.',
+  'الحرب الأهلية الأمريكية 1861-1865م انتهت بإلغاء العبودية.',
+  'أبراهام لينكولن أعلن تحرير العبيد في أمريكا عام 1863م.',
+  'انهيار سوق الأسهم الأمريكي 1929م أشعل الكساد الاقتصادي الكبير.',
+  'الثورة البلشفية 1917م أسست الاتحاد السوفيتي بقيادة لينين.',
+  'ستالين حكم الاتحاد السوفيتي من 1924 إلى 1953م.',
+  'الصين الشعبية تأسست عام 1949م بقيادة ماو تسي تونغ.',
+  'حرب كوريا 1950-1953م انتهت بتقسيم كوريا شمالاً وجنوباً.',
+  'حرب فيتنام 1955-1975م من أطول الحروب الأمريكية.',
+  'اغتيال جون كينيدي 1963م صدم أمريكا والعالم.',
+  'نزول الإنسان على القمر 1969م إنجاز بشري تاريخي.',
+  'انهيار جدار برلين 1989م أعاد توحيد ألمانيا.',
+  'أحداث 11 سبتمبر 2001م غيّرت السياسة الأمريكية والعالمية.',
+  'ثورات الربيع العربي 2010-2011م هزّت عدة دول عربية.',
+  'وباء كوفيد-19 انتشر عام 2020م وأثّر على العالم بأسره.',
+  'أول من طار بالطائرة الأخوان رايت عام 1903م.',
+  'أول سفينة فضاء تصل إلى القمر كانت أبولو 11 عام 1969م.',
+  'أول إنسان في الفضاء كان يوري غاغارين السوفيتي عام 1961م.',
+  'ماجلان أول من أتم الدوران حول الكرة الأرضية.',
+  'فاسكو دي غاما اكتشف الطريق البحري من أوروبا إلى الهند.',
+  'فلسطين أرض عربية إسلامية تعرضت للاحتلال الصهيوني عام 1948م.',
+  'الأزهر الشريف درع الإسلام وقلعة العلم منذ أكثر من 1000 سنة.',
+  'مدينة البتراء الأردنية نحتها الأنباط في الصخر قبل 2000 سنة.',
+  'سور الصين العظيم أطول منشأة بشرية في التاريخ بطول 21000 كم.',
+  'تاج محل في الهند بناه الإمبراطور شاه جهان حباً لزوجته.',
+  'الأكسجين يشكّل 21٪ من تركيب الهواء الجوي.',
+  'ثاني أكسيد الكربون يستخدمه النبات في عملية البناء الضوئي.',
+  'الماء يغلي عند 100 درجة مئوية ويتجمد عند صفر درجة.',
+  'الصوت يسير بسرعة 343 متراً في الثانية في الهواء.',
+  'الضوء يسير بسرعة 300 ألف كيلومتر في الثانية.',
+  'الشمس على بعد 150 مليون كيلومتر من الأرض.',
+  'القمر على بعد 384 ألف كيلومتر من الأرض.',
+  'المجموعة الشمسية تتكون من 8 كواكب رئيسية.',
+  'المشتري أكبر كواكب المجموعة الشمسية وعليه عاصفة دائمة.',
+  'زحل مميز بحلقاته الجميلة المكوّنة من جليد وصخور.',
+  'عمر الكون يُقدَّر بـ 13.8 مليار سنة.',
+  'الأرض عمرها 4.5 مليار سنة.',
+  'الديناصورات انقرضت منذ 66 مليون سنة بسبب كارثة كونية.',
+  'الإنسان العاقل (هومو سابيينس) ظهر منذ 300 ألف سنة.',
+  'الحمض النووي DNA يحتوي على الشيفرة الوراثية لكل كائن حي.',
+  'خلايا جسم الإنسان تتجدد كل 7 سنوات تقريباً.',
+  'القلب يضخ 5 لترات من الدم في الدقيقة.',
+  'الرئتان تستوعبان 6 لترات من الهواء.',
+  'الجهاز العصبي يرسل إشارات بسرعة 120 متراً في الثانية.',
+  'المخ يستهلك 20٪ من طاقة الجسم رغم كونه 2٪ من وزنه.',
+  'الجهاز المناعي يحارب الميكروبات والفيروسات والخلايا السرطانية.',
+  'التطعيم يحمي من الأمراض بتعليم الجهاز المناعي التعرف عليها.',
+  'البنسلين أول مضاد حيوي اكتشفه ألكسندر فلمنج عام 1928م.',
+  'الأشعة السينية اكتشفها رونتجن عام 1895م.',
+  'الكهرباء النافعة طوّرها توماس إيديسون وطوّر المصباح الكهربي.',
+  'المغناطيسية والكهرباء مرتبطتان ويمكن تحويل إحداهما للأخرى.',
+  'الذرة تتكون من بروتونات ونيوترونات في النواة وإلكترونات حولها.',
+  'الطاقة والمادة متحولتان بين بعضهما وفق معادلة أينشتاين E=mc².',
+  'الثقب الأسود جسم ذو جاذبية شديدة لا يفلت منه حتى الضوء.',
+  'النجوم تنتج طاقتها من الاندماج النووي لنواة الهيدروجين.',
+  'الشمس تحرق 600 مليون طن من الهيدروجين في كل ثانية.',
+  'المذنبات كرات من الجليد والغبار تدور حول الشمس.',
+  'النيازك صخور فضائية تسقط على الأرض أو الكواكب.',
+  'الزلازل تحدث بسبب تحرك الصفائح التكتونية.',
+  'البراكين تقذف الحمم البركانية من باطن الأرض.',
+  'المحيطات تغطي 71٪ من سطح الأرض.',
+  'أعمق نقطة في المحيطات هي خندق ماريانا بعمق 11 كم.',
+  'الغابات المطيرة تُنتج 28٪ من أكسجين الأرض.',
+  'الأمازون أكبر غابة مطيرة في العالم وتسمى رئة الأرض.',
+  'التمساح حيوان من أقدم الكائنات الحية باقي دون تغيير منذ ملايين السنين.',
+  'الحوت الأزرق أكبر حيوان عاش على الأرض بطول 30 متراً.',
+  'الفيل أذكى الحيوانات البرية ولديه أفضل ذاكرة.',
+  'الدلفين يتواصل بنظام صوتي معقد ويُعد من أذكى الحيوانات.',
+  'الغوريلا الجينوم الوراثي مطابق للإنسان بنسبة 98.3٪.',
+  'النحلة تستطيع التعرف على وجه الإنسان.',
+  'الأخطبوط يستطيع تغيير لونه وشكله في ثوانٍ.',
+  'الحمامة الزاجلة تعود لمنزلها من مسافات آلاف الكيلومترات.',
+  'الهجرة الطيرية معجزة الملاحة الطبيعية بدون أجهزة.',
+  'النباتات آكلة الحشرات موجودة وتعيش في بيئات فقيرة بالمعادن.',
+  'الفطريات كائنات ليست نباتات ولا حيوانات لها مملكتها الخاصة.',
+  'البكتيريا أقدم الكائنات الحية وأكثرها عدداً على الأرض.',
+  'الفيروسات أصغر من البكتيريا وتحتاج خلية حية لتتكاثر.',
+  'الطاقة الشمسية نظيفة ومتجددة ويمكنها إضاءة العالم كله.',
+  'طاقة الرياح من أسرع قطاعات الطاقة المتجددة نمواً.',
+  'الهيدروجين وقود المستقبل النظيف الذي لا ينتج إلا الماء.',
+  'التغير المناخي يرفع درجات الحرارة ويذيب الجليد القطبي.',
+  'طبقة الأوزون تحمي الأرض من الأشعة فوق البنفسجية الضارة.',
+  'الغازات الدفيئة كثاني أكسيد الكربون تحبس الحرارة في الغلاف الجوي.',
+  'إعادة التدوير تقلل النفايات وتوفر المواد الخام.',
+  'الماء يستغرق آلاف السنين ليتشكل في طبقات المياه الجوفية.',
+  'الأنهار الجليدية تتراجع بسبب الاحترار العالمي.',
+  'الشعاب المرجانية نظام بيئي غني تهدده زيادة حموضة المحيطات.',
+  'الأشجار تمتص ثاني أكسيد الكربون وتخزن الكربون في أخشابها.',
+  'التربة الصحية تحتوي على مليارات الكائنات الدقيقة.',
+  'الماء الملوح لا يصلح للشرب وتحليته يحتاج طاقة.',
+  'محطات تحلية الماء أساسية في الدول الخليجية الجافة.',
+  'الطاقة النووية تولّد كهرباء نظيفة لكن بمخاطر نفايات.',
+  'النانو تكنولوجي علم معالجة المواد على مستوى الذرة.',
+  'الطباعة ثلاثية الأبعاد تغيّر الطب والصناعة والبناء.',
+  'الذكاء الاصطناعي يحاكي القدرة البشرية على التفكير والتعلم.',
+  'الروبوتات تستخدم في الصناعة والجراحة واستكشاف الفضاء.',
+  'الإنترنت غيّر طريقة التواصل والتعلم والعمل في العالم.',
+  'الهاتف الذكي يحوي قدرة حوسبة أكبر من أجهزة ناسا عام 1969م.',
+  'الثورة الرقمية بدأت في ثمانينيات القرن الماضي.',
+  'الليزر يُستخدم في الطب والصناعة والاتصالات.',
+  'الأشعة تحت الحمراء تُستخدم في الرؤية الليلية والطب.',
+  'الموجات الصوتية فوق الصوتية تُستخدم في التصوير الطبي.',
+  'المغناطيس الفائق التوصيل يُستخدم في القطارات فائقة السرعة.',
+  'الفيزياء الكمية تصف سلوك الجسيمات على المستوى الذري.',
+  'نظرية الأوتار تحاول توحيد قوانين الفيزياء الكبرى والصغرى.',
+  'الجاذبية قوة تشد الأجسام نحو بعضها حسب كتلتها.',
+  'المد والجزر ظاهرة تسببها جاذبية القمر على الأرض.',
+  'الشفق القطبي ظاهرة ضوئية تسببها التفاعلات المغناطيسية مع الشمس.',
+  'الكسوف يحدث حين يقف القمر بين الأرض والشمس.',
+  'الخسوف يحدث حين تقف الأرض بين الشمس والقمر.',
+  'النجم النيوتروني أكثف الأجسام الكونية المعروفة.',
+  'المجرة درب التبانة تحتوي على 200 مليار نجم.',
+  'أقرب نجم للأرض بعد الشمس هو بروكسيما قنطوري.',
+  'المريخ الكوكب الأحمر يستغرق اليوم فيه 24 ساعة و37 دقيقة.',
+  'الزهرة أكثر الكواكب حرارة رغم بُعده عن الشمس أكثر من عطارد.',
+  'عطارد أقرب الكواكب للشمس وأسرعها دوراناً حولها.',
+  'أورانوس ينزاح 98 درجة على جانبه أثناء دورانه.',
+  'نبتون يبعد عن الشمس 30 ضعف بُعد الأرض وعليه عواصف هائجة.',
+  'بلوتو خُفِّض من مرتبة الكوكب إلى كوكب قزم عام 2006م.',
+  'مساحة الأرض الكلية 510 مليون كيلومتر مربع.',
+  'اليابسة تغطي 29٪ من سطح الأرض.',
+  'أعلى قمة في العالم هي جبل إيفرست بارتفاع 8848 متراً.',
+  'أعمق نهر في العالم هو نهر الكونغو في أفريقيا.',
+  'أطول نهر في العالم هو نهر النيل بطول 6650 كيلومتراً.',
+  'أكبر صحراء في العالم هي الصحراء الكبرى في أفريقيا.',
+  'أكبر غابة في العالم هي غابة الأمازون في أمريكا الجنوبية.',
+  'أكبر بحيرة في العالم هي بحر قزوين.',
+  'أعمق بحيرة في العالم هي بحيرة بايكال في روسيا.',
+  'الأمازون أكبر نهر في العالم من حيث حجم التدفق.',
+  'أفريقيا القارة الوحيدة التي يمر خطا الاستواء ومدار السرطان بها.',
+  'آسيا أكبر قارات العالم مساحةً وأكثرها سكاناً.',
+  'أوروبا أصغر قارات العالم باستثناء أستراليا.',
+  'أستراليا قارة وكذلك دولة بمساحة 7.7 مليون كيلومتر مربع.',
+  'القارة القطبية الجنوبية (أنتاركتيكا) أبرد مكان على الأرض.',
+  'القطب الشمالي محيط مجمّد والقطب الجنوبي قارة متجمدة.',
+  'مصر تقع في شمال شرق أفريقيا على ضفاف البحر الأبيض المتوسط.',
+  'نهر النيل يمر بـ 11 دولة أفريقية قبل أن يصب في البحر.',
+  'دلتا النيل من أخصب الأراضي الزراعية في العالم.',
+  'واحة سيوة من أجمل واحات الصحراء الغربية في مصر.',
+  'شبه جزيرة سيناء تربط قارتي آسيا وأفريقيا.',
+  'البحر الأحمر يفصل أفريقيا عن شبه الجزيرة العربية.',
+  'مضيق هرمز بوابة الخليج العربي وأحد أهم الممرات البحرية.',
+  'قناة السويس تختصر الرحلة من أوروبا إلى آسيا بـ 7000 كيلومتر.',
+  'جبل طارق مضيق يربط المحيط الأطلسي بالبحر المتوسط.',
+  'البحر المتوسط بحر شبه مغلق تحيط به ثلاث قارات.',
+  'الصحراء العربية من أجفّ صحاري العالم وأقلها أمطاراً.',
+  'الربع الخالي في السعودية أكبر رمال متصلة في العالم.',
+  'هضبة التيبت أعلى هضبة في العالم تُسمى سقف العالم.',
+  'جبال الهيمالايا تحتوي على 14 قمة يزيد ارتفاعها عن 8000 متر.',
+  'فنلندا بلد الألف بحيرة ولها أكثر من 187 ألف بحيرة فعلاً.',
+  'كندا الدولة الثانية في المساحة وبها 20٪ من احتياطي المياه العذبة.',
+  'البرازيل أكبر دول أمريكا الجنوبية وتحتضن غابة الأمازون.',
+  'روسيا أكبر دول العالم مساحةً تمتد عبر 11 منطقة زمنية.',
+  'الصين أكثر دول العالم سكاناً وثانيها اقتصاداً.',
+  'الهند تتجاوز سكانها 1.4 مليار نسمة.',
+  'نيجيريا أكثر دول أفريقيا سكاناً.',
+  'إثيوبيا أكثر دول أفريقيا سكاناً بعد نيجيريا.',
+  'المغرب يشكّل بوابة أفريقيا نحو أوروبا.',
+  'تونس أصغر دول شمال أفريقيا.',
+  'الجزائر أكبر دول أفريقيا مساحةً.',
+  'السودان كان أكبر دولة أفريقية قبل انفصال الجنوب.',
+  'تنزانيا مقر جبل كيليمنجارو أعلى قمة في أفريقيا.',
+  'جزيرة مدغشقر رابع أكبر جزر العالم وموطن لكائنات نادرة.',
+  'كينيا مشهورة بمحمياتها الطبيعية وعدائيها الأولمبيين.',
+  'جنوب أفريقيا عاصمتها ثلاث: إدارية وتشريعية وقضائية.',
+  'جمهورية الكونغو الديمقراطية أغنى دول العالم بالمعادن.',
+  'سيراليون في غرب أفريقيا وسط الغابات الاستوائية.',
+  'غانا أول دولة أفريقية تحررت من الاستعمار عام 1957م.',
+  'كوت ديفوار من أكبر منتجي الكاكاو في العالم.',
+  'إندونيسيا أكبر دولة في جنوب شرق آسيا وتتألف من 17500 جزيرة.',
+  'الفلبين أرخبيل يتكون من 7641 جزيرة.',
+  'اليابان جزيرة لكنها رابع اقتصاد في العالم.',
+  'كوريا الجنوبية معجزة اقتصادية نهضت من الرماد.',
+  'تايلاند مشهورة بمعابدها الذهبية وأطعمتها الحارة.',
+  'فيتنام دولة استعادت وحدتها عام 1975م.',
+  'الهند الصينية تُشير إلى منطقة جنوب شرق آسيا.',
+  'ماليزيا دولتان جزيرتان وبر رئيسي.',
+  'سنغافورة أصغر دول جنوب شرق آسيا وأكثرها ثراءً.',
+  'نيوزيلندا دولة جزيرية في جنوب المحيط الهادئ.',
+  'بابوا غينيا الجديدة دولة في جنوب غرب المحيط الهادئ.',
+  'بنغلاديش من أكثر دول العالم كثافة سكانية.',
+  'باكستان دولة إسلامية تمتلك أسلحة نووية.',
+  'أفغانستان تُسمى مقبرة الإمبراطوريات لصعوبة إخضاعها.',
+  'إيران أكبر دولة في الشرق الأوسط من حيث المساحة.',
+  'تركيا تجمع بين قارتي آسيا وأوروبا عبر مضيق البسفور.',
+  'اليونان موطن الحضارة الغربية الكلاسيكية.',
+  'إيطاليا عاصمتها روما وفيها دولة الفاتيكان.',
+  'فرنسا أكثر الدول الأوروبية زيارةً من السياح.',
+  'إسبانيا موطن الفلامنكو وتصاريع الثيران.',
+  'البرتغال أول دولة بدأت الاستكشافات الجغرافية الكبرى.',
+  'ألمانيا أكبر اقتصاد أوروبي.',
+  'بريطانيا أسست أكبر إمبراطورية في التاريخ.',
+  'النمسا موطن موزارت وعاصمتها فيينا.',
+  'سويسرا محايدة في الحروب منذ 1815م وعاصمتها برن.',
+  'السويد والنرويج والدنمارك الدول الاسكندنافية.',
+  'فنلندا مشهورة بالأضواء الشمالية (الشفق القطبي).',
+  'بولندا أكبر دول أوروبا الوسطى.',
+  'أوكرانيا من أكبر دول أوروبا مساحةً.',
+  'رومانيا موطن أسطورة دراكولا في منطقة ترانسيلفانيا.',
+  'البلقان منطقة تاريخية اتسمت بالتوترات والحروب.',
+  'القوقاز منطقة بين البحر الأسود وبحر قزوين.',
+  'آسيا الوسطى تضم دول مثل كازاخستان وأوزبكستان وطاجيكستان.',
+  'المكسيك موطن حضارات الأزتك والمايا.',
+  'البيرو موطن حضارة الإنكا وماتشو بيتشو.',
+  'الأرجنتين ثاني أكبر دول أمريكا الجنوبية.',
+  'تشيلي أطول دولة في العالم من الشمال للجنوب.',
+  'كولومبيا مشهورة بالقهوة والتنوع البيولوجي.',
+  'فنزويلا تمتلك أكبر احتياطي نفطي مؤكد في العالم.',
+  'إكوادور من أكثر دول العالم تنوعاً بيولوجياً.',
+  'بوليفيا دولة حبيسة تحصل على منفذ بحري عبر بيرو.',
+  'باراغواي دولة حبيسة في قلب أمريكا الجنوبية.',
+  'أوروغواي من أكثر دول أمريكا الجنوبية استقراراً.',
+  'كوبا جزيرة في البحر الكاريبي عاصمتها هافانا.',
+  'هايتي أول دولة أفريقية تنال استقلالها في أمريكا.',
+  'اللغة العربية من أقدم اللغات السامية الحية في العالم.',
+  'يتحدث العربية أكثر من 400 مليون شخص حول العالم.',
+  'العربية لغة القرآن الكريم وإحدى اللغات الرسمية في الأمم المتحدة.',
+  'الأبجدية العربية تتكون من 28 حرفاً تُكتب من اليمين لليسار.',
+  'الضاد حرف عربي خالص لا يوجد في أي لغة أخرى.',
+  'اللغة العربية تتفرع إلى فصحى وعامية ولهجات محلية.',
+  'الفصحى لغة الكتابة الرسمية والتعليم والإعلام.',
+  'الشعر العربي يعود إلى ما قبل الإسلام بمئات السنين.',
+  'المعلقات السبع من أروع ما قيل في الشعر الجاهلي.',
+  'امرؤ القيس أشهر شعراء العرب الجاهليين.',
+  'النابغة الذبياني شاعر جاهلي شهير بحكمته وتصويره.',
+  'الجاحظ من أعظم كُتّاب النثر العربي وله كتاب البيان والتبيين.',
+  'ابن المقفع أدخل كليلة ودمنة إلى العربية من الفارسية.',
+  'ألف ليلة وليلة تراث قصصي عربي عالمي الشهرة.',
+  'المتنبي أمير شعراء العرب ولا يزال يُدرَّس حتى اليوم.',
+  'أبو تمام وصاحبه البحتري من كبار شعراء العصر العباسي.',
+  'أبو العلاء المعري شاعر فيلسوف عربي لا مثيل له.',
+  'المقامات أسلوب أدبي ابتكره بديع الزمان الهمذاني.',
+  'مقامات الحريري من أجمل ما كُتب في العربية من نثر فني.',
+  'الخط العربي من أجمل الخطوط في العالم وهو فن تشكيلي.',
+  'الخطوط العربية: النسخ والثلث والديواني والكوفي والرقعة.',
+  'الخط الكوفي أقدم خطوط العربية وأُحكم في الكوفة.',
+  'النحو العربي علم يضبط قواعد الكلام العربي.',
+  'سيبويه وضع أول كتاب شامل في النحو العربي.',
+  'الكتاب لسيبويه مرجع لا غنى عنه في نحو العربية.',
+  'ابن هشام له مغني اللبيب من أشهر كتب النحو.',
+  'علم الصرف يدرس بنية الكلمة وتصريفها.',
+  'البلاغة العربية تنقسم إلى المعاني والبيان والبديع.',
+  'علم العروض يضبط الأوزان الشعرية.',
+  'الخليل بن أحمد الفراهيدي واضع علم العروض ومبتكر المعجم.',
+  'أول معجم عربي هو العين للخليل بن أحمد.',
+  'لسان العرب لابن منظور أوسع قاموس عربي.',
+  'المصباح المنير للفيومي معجم لغوي مشهور في الفقه.',
+  'الحديث النبوي أسهم كثيراً في إثراء المفردات العربية.',
+  'الاستعارة والتشبيه من أهم أدوات البلاغة العربية.',
+  'الجناس والطباق من ألوان البديع في اللغة العربية.',
+  'المثل العربي حكمة مكثفة تعبّر عن تجارب الأجداد.',
+  'أمثال العرب جمعها الميداني في مجمع الأمثال.',
+  'رسائل إخوان الصفا من أجمل الكتب الفلسفية بالعربية.',
+  'مقدمة ابن خلدون مرجع تاريخي واجتماعي لا يُضاهى.',
+  'الغزالي كتب إحياء علوم الدين بلغة عربية رفيعة.',
+  'ابن سينا كتب كتاب الشفاء والقانون بالعربية.',
+  'ابن الهيثم رائد علم البصريات وكتب بالعربية.',
+  'البيروني كتب تحقيق ما للهند بالعربية.',
+  'الخوارزمي ألّف كتاب الجبر بالعربية وعنه جاء اسم Algebra.',
+  'ألفاظ كثيرة في اللغات الأوروبية ذات أصل عربي مثل الكيمياء والجبر.',
+  'قافية الشعر العربي تميزه وتُعلي من جماليته.',
+  'المديح والهجاء والغزل والرثاء من أغراض الشعر العربي.',
+  'الفخر بالنسب والقبيلة كان موضوعاً أساسياً للشعر الجاهلي.',
+  'الوصف من أهم موضوعات الشعر العربي الكلاسيكي.',
+  'أبو نواس شاعر عباسي شهير بشعر الخمر والطرب.',
+  'بشار بن برد أول كبار شعراء العصر العباسي المتأثر بالعجم.',
+  'ابن الرومي شاعر عباسي بكّاء شهير بصدق عاطفته.',
+  'ابن زيدون وولادة بنت المستكفي قصة حب في الأندلس.',
+  'لسان الدين ابن الخطيب كاتب وزير وشاعر أندلسي بارع.',
+  'محمود درويش أعظم شعراء فلسطين وصوت شعبها.',
+  'نزار قباني شاعر عربي شهير بقصائد الحب والسياسة.',
+  'أحمد شوقي أمير الشعراء العرب في القرن العشرين.',
+  'حافظ إبراهيم شاعر النيل ومغني اللغة العربية.',
+  'طه حسين عميد الأدب العربي وأحد أكبر النقاد.',
+  'نجيب محفوظ أول عربي يحصل على جائزة نوبل في الأدب 1988م.',
+  'ثلاثية نجيب محفوظ بين القصرين والسكرية وقصر الشوق رائعته الكبرى.',
+  'يوسف إدريس قصصي مصري كبير يُعد موبسان العرب.',
+  'توفيق الحكيم رائد المسرح العربي الحديث.',
+  'ميخائيل نعيمة كاتب لبناني من رواد النهضة الأدبية.',
+  'جبران خليل جبران أديب لبناني كتب بالعربية والإنجليزية.',
+  'أمين الريحاني مفكر لبناني رائد في الأدب المهجري.',
+  'البديع عند ابن المعتز أول من جمعه في كتاب.',
+  'الحماسة لأبي تمام ديوان مختارات شعرية رائع.',
+  'الأصمعي راوية شعر عربي جمع كثيراً من التراث.',
+  'ابن قتيبة صاحب كتاب الشعر والشعراء.',
+  'الآمدي صاحب الموازنة بين البحتري وأبي تمام.',
+  'الجرجاني صاحب نظرية النظم في دلائل الإعجاز.',
+  'الكلمة في العربية إما اسم أو فعل أو حرف.',
+  'الجملة في العربية إما اسمية (المبتدأ والخبر) أو فعلية.',
+  'الإعراب علامة تحديد وظيفة الكلمة في الجملة.',
+  'الرفع والنصب والجر والجزم حالات الإعراب الأربع.',
+  'الضمة علامة رفع والفتحة علامة نصب والكسرة علامة جر.',
+  'الأسماء الستة: أب وأخ وحم وفو وذو وهن لها إعراب خاص.',
+  'المثنى يُرفع بالألف ويُنصب ويُجر بالياء.',
+  'جمع المذكر السالم يُرفع بالواو ويُنصب ويُجر بالياء.',
+  'جمع المؤنث السالم يُرفع بالضمة ويُنصب ويُجر بالكسرة.',
+  'الممنوع من الصرف لا يُنوَّن ويُجر بالفتحة.',
+  'الضمائر المنفصلة: أنا ونحن وأنتَ وأنتِ وهو وهي وهم وهن.',
+  'الأفعال الخمسة: يفعلان وتفعلان ويفعلون وتفعلون وتفعلين.',
+  'المضارع المعتل الآخر يُجزم بحذف حرف العلة.',
+  'إنّ وأخواتها تنصب المبتدأ وترفع الخبر.',
+  'كان وأخواتها ترفع المبتدأ وتنصب الخبر.',
+  'اسم الفاعل يصاغ من الثلاثي على وزن فاعل.',
+  'اسم المفعول من الثلاثي على وزن مفعول.',
+  'المصدر اسم الحدث والحدوث مثل: كتابة، ضرب، قراءة.',
+  'الكرة الأرضية تدور حول نفسها مرة كل 24 ساعة.',
+  'الكرة الأرضية تدور حول الشمس مرة كل 365.25 يوم.',
+  'السنة الكبيسة تحدث كل 4 سنوات لتعويض الربع يوم.',
+  'التقويم الميلادي مبني على ميلاد السيد المسيح.',
+  'التقويم الهجري مبني على هجرة النبي محمد ﷺ.',
+  'أقدم حضارة معروفة هي حضارة سومر في العراق.',
+  'الكتابة اخترعها السومريون منذ 5000 سنة تقريباً.',
+  'العجلة اخترعها الإنسان قبل 5000 سنة في بلاد الرافدين.',
+  'الطباعة اخترعها غوتنبرغ عام 1440م في ألمانيا.',
+  'الراديو اخترعه ماركوني عام 1895م.',
+  'التلفزيون اخترعه جون بيرد عام 1926م.',
+  'الهاتف اخترعه ألكسندر غراهام بيل عام 1876م.',
+  'الكمبيوتر الحديث طوّره فريق من العلماء في أربعينيات القرن الماضي.',
+  'أول برنامج حاسوبي كتبته آدا لوفلاس عام 1843م.',
+  'الإنترنت بدأ كمشروع عسكري أمريكي اسمه أربانت.',
+  'أول موقع ويب نشره تيم بيرنرز-لي عام 1991م.',
+  'غوغل أُسست عام 1998م وهي أكثر محركات البحث استخداماً.',
+  'فيسبوك أُسس عام 2004م من قِبل مارك زوكربيرغ.',
+  'يوتيوب أُسس عام 2005م واستُحوِذ عليه من غوغل.',
+  'تويتر (إكس) أُسس عام 2006م.',
+  'الهاتف الذكي الأول أطلقته شركة آبل بهاتف آيفون عام 2007م.',
+  'الطائرة اخترعها الأخوان رايت عام 1903م.',
+  'أول رحلة فضائية كانت عام 1961م مع يوري غاغارين.',
+  'ناسا تأسست عام 1958م بعد إطلاق السوفيت للقمر الصناعي.',
+  'المحطة الفضائية الدولية ISS بدأ بناؤها 1998م.',
+  'المسبار ڤويجر 1 أبعد جسم صنعه البشر في الفضاء.',
+  'الأبراج الفلكية 12 برجاً تمثل مجموعات نجوم.',
+  'الغواصة اخترعها البشر في القرن التاسع عشر.',
+  'المجهر اخترعه أنتوني فان ليفنهوك عام 1674م.',
+  'التلسكوب اخترعه هانس ليبرشاي عام 1608م.',
+  'الساعة الميكانيكية اخترعها بيتر هنلاين عام 1510م.',
+  'الورق اخترعه الصينيون منذ 2000 سنة.',
+  'الحرير اخترعه الصينيون وحافظوا على سره قروناً.',
+  'البارود اخترعه الصينيون وانتشر عبر التجارة.',
+  'الأرقام العربية 0-9 أصلها هندي نقلها العرب للغرب.',
+  'الصفر مفهوم رياضي أدخله العرب إلى الحضارة الغربية.',
+  'معادلات الجبر ابتكرها الخوارزمي في القرن التاسع.',
+  'الغواصات الحديثة تستطيع الغوص لآلاف الأمتار.',
+  'الذكاء الاصطناعي يُحسن الطب والتعليم والصناعة.',
+  'الطاقة النووية تولّد 10٪ من الكهرباء العالمية.',
+  'ألمانيا أعلنت التخلي عن الطاقة النووية بحلول 2023م.',
+  'الرياضيات لغة عالمية يفهمها الجميع.',
+  'فيثاغورث وضع نظريته الشهيرة عن المثلث القائم.',
+  'نظرية إقليدس أساس الهندسة الكلاسيكية.',
+  'أرشيميدس كشف قانون الطفو في الماء.',
+  'نيوتن اكتشف قانون الجاذبية حين رأى تفاحة تسقط.',
+  'أينشتاين أطلق نظرية النسبية التي غيّرت فهمنا للكون.',
+  'ستيفن هوكينج عاش مع شلل رباعي وأثرى الفيزياء النظرية.',
+  'ماري كوري أول امرأة تحصل على جائزة نوبل مرتين.',
+  'نيلز بور أحد آباء فيزياء الكم.',
+  'ماكس بلانك قدّم نظرية الكم التي ثورت الفيزياء.',
+  'جيمس واتسون وفرانسيس كريك اكتشفا البنية الحلزونية للـ DNA.',
+  'لويس باستور اكتشف مبدأ التعقيم وطوّر اللقاحات.',
+  'إدوارد جينر مكتشف لقاح الجدري أول لقاح في التاريخ.',
+  'روبرت كوخ اكتشف جرثومة السل والكوليرا.',
+  'الدكتور كريستيان بارنار أجرى أول عملية زرع قلب عام 1967م.',
+  'الأطراف الصناعية الذكية دخلت حياة المعاقين بمساعدة الذكاء الاصطناعي.',
+  'الطباعة الحيوية تسمح بطباعة أنسجة بشرية ثلاثية الأبعاد.',
+  'العلاج الجيني يُصحح الأمراض الوراثية في المستقبل.',
+  'السرطان مرض يصيب ملايين ويبحث العلماء عن علاجه الشامل.',
+  'مرض السكري يصيب 537 مليون شخص حول العالم.',
+  'الإيدز (نقص المناعة المكتسب) اكتُشف عام 1981م.',
+  'كوفيد-19 وباء ضرب العالم عام 2020م.',
+  'اللقاحات أنقذت حياة مئات الملايين من البشر.',
+  'المضادات الحيوية أنقذت البشر من موجات وبائية.',
+  'أطول عمر لإنسان موثق هو 122 سنة وكانت فرنسية.',
+  'متوسط عمر الإنسان ارتفع من 35 سنة تاريخياً إلى 73 اليوم.',
+  'نوم ساعات كافية يحسّن الذاكرة والصحة والمزاج.',
+  'الجري يُفرز الإندورفين هرمون السعادة الطبيعي.',
+  'السكر الزائد يرفع خطر السكري وأمراض القلب.',
+  'الملح الزائد يرفع ضغط الدم.',
+  'الخضروات الورقية تحوي حديداً وفيتامينات أساسية.',
+  'الكالسيوم يقوي العظام ويوجد في الألبان والسمسم.',
+  'الرياضة تمنع الاكتئاب وتقوي جهاز المناعة.',
+  'التنفس العميق يخفض مستوى التوتر والقلق.',
+  'النوم الجيد ضروري لأداء الدماغ وإصلاح الجسم.',
+  'الابتسامة تحسّن المزاج حتى لو كانت مصطنعة.',
+  'الاجتماعية البشرية ضرورة نفسية كالطعام والشراب.',
+  'الامتنان اليومي يرفع مستوى السعادة.',
+  'تعلم لغة ثانية يؤخر الإصابة بالخرف.',
+  'العزلة الطويلة تضر بالصحة الجسدية والنفسية.',
+  'الفن والموسيقى يُعبّران عن أعمق مشاعر الإنسان.',
+  'القراءة تزيد التعاطف وتوسع مدارك الإنسان.',
+  'التعلم المستمر يحافظ على صحة الدماغ مع التقدم في العمر.',
+  'التعليم المبكر يؤسس للشخصية والمهارات طوال الحياة.',
+  'اللعب للأطفال ليس وقتاً ضائعاً بل أساس النمو.',
+  'الفضول صفة الأطفال التي يجب الحفاظ عليها.',
+  'الأخطاء وسيلة التعلم لا سبب للخزي.',
+  'التعاون يُنجز ما يعجز عنه الفرد.',
+  'الاختلاف في الآراء ثروة ومصدر إبداع.',
+  'الاحترام المتبادل أساس أي مجتمع سليم.',
+  'الديمقراطية تعني حق الشعب في اختيار حكامه.',
+  'حقوق الإنسان مبادئ كونية لا تنازل عنها.',
+  'حرية التعبير حق أساسي في المجتمعات الديمقراطية.',
+  'العدالة الاجتماعية هدف الحضارة الإنسانية.',
+  'الفقر والجهل عدوا التقدم البشري.',
+  'التعليم الجيد أفضل استثمار في مستقبل الأمم.',
+  'العلم والإيمان لا يتعارضان بل يتكاملان.',
+  'كرة القدم الرياضة الأكثر شعبية في العالم.',
+  'كأس العالم لكرة القدم يُقام كل 4 سنوات.',
+  'البرازيل أكثر دول العالم فوزاً بكأس العالم (5 مرات).',
+  'ألمانيا وإيطاليا كل منهما فازت 4 مرات بكأس العالم.',
+  'الأرجنتين فازت بكأس العالم 2022م في قطر.',
+  'ميسي يُعدّ كثير من المحللين أفضل لاعب في التاريخ.',
+  'رونالدو لاعب برتغالي حطّم أرقاماً قياسية عديدة.',
+  'نادي ريال مدريد الأكثر تتويجاً بدوري أبطال أوروبا.',
+  'برشلونة ورونالدو لم يجتمعا لأنه في ريال مدريد.',
+  'الدوري الإنجليزي الممتاز الأكثر مشاهدةً في العالم.',
+  'محمد صلاح لاعب مصري نجم في نادي ليفربول الإنجليزي.',
+  'الأولمبياد يُقام كل 4 سنوات ويجمع دول العالم.',
+  'الألعاب الأولمبية تأسست في اليونان القديمة.',
+  'أثينا استضافت أول ألعاب أولمبية حديثة عام 1896م.',
+  'باريس 2024 استضافت أحدث نسخة من الألعاب الأولمبية.',
+  'السباحة الأولمبية ميدالياتها من بين أكثر الميداليات الذهبية.',
+  'مايكل فيلبس أكثر رياضي حصولاً على ميداليات ذهبية أولمبية.',
+  'أوسين بولت أسرع إنسان على وجه الأرض (9.58 ثانية).',
+  'روجر فيدرير حاز 20 لقب غراند سلام في التنس.',
+  'رافاييل نادال حاز 22 لقب غراند سلام.',
+  'نوفاك ديوكوفيتش حاز 24 لقب غراند سلام.',
+  'سيرينا ويليامز من أعظم لاعبات التنس في التاريخ.',
+  'كرة السلة رياضة ابتكرها جيمس نيسميث عام 1891م.',
+  'نادي شيكاغو بولز من أشهر أندية كرة السلة.',
+  'مايكل جوردان يُعد أعظم لاعب كرة سلة في التاريخ.',
+  'لوبرون جيمس المنافس الأبرز لجوردان على لقب الأفضل.',
+  'كرة الطائرة رياضة شعبية تلعبها فرق من 6 لاعبين.',
+  'كرة اليد تحظى بشعبية كبيرة في أوروبا والوطن العربي.',
+  'مصر والدنمارك وفرنسا من أقوى منتخبات كرة اليد.',
+  'الغولف رياضة الدقة وتلعبها نجوم من حول العالم.',
+  'تايغر وودز من أعظم لاعبي الغولف في التاريخ.',
+  'كرة القدم الأمريكية رياضة شعبية جداً في الولايات المتحدة.',
+  'الفورمولا 1 أسرع رياضة سيارات في العالم.',
+  'لويس هاميلتون حاز 7 بطولات عالمية في الفورمولا 1.',
+  'ميشاييل شوماخر بطل عالم 7 مرات في الفورمولا 1.',
+  'كرة الرغبي رياضة قتالية شعبية في بريطانيا وأستراليا ونيوزيلندا.',
+  'الكريكيت الرياضة الأشهر في الهند وباكستان وأستراليا.',
+  'الجودو فن قتالي ياباني رياضة أولمبية منذ 1964م.',
+  'الكاراتيه فن قتالي ياباني أصبح أولمبياً في 2021م.',
+  'الملاكمة تسمى بملكة الرياضات القتالية.',
+  'محمد علي كلاي أسطورة الملاكمة العالمية.',
+  'رياضة العدو الأكثر ممارسةً وأبسط الرياضات.',
+  'ماراثون أثينا سبّاقة بطوله 42 كيلومتراً وأُسس تخليداً لجندي.',
+  'الملاكمة بالمجموعات (MMA) رياضة صاعدة نجمها الأبرز مكغريغور.',
+  'الدفاع عن النفس فن جسدي وعقلي معاً.',
+  'الإبحار الشراعي رياضة أولمبية تعتمد على الريح.',
+  'القفز بالمظلة رياضة الإثارة والجرأة.',
+  'تسلق الجبال رياضة صعبة تحتاج قوة وتحملاً.',
+  'الجمباز فن الحركة والقوة والمرونة.',
+  'سيمون بايلز من أعظم لاعبات الجمباز عبر التاريخ.',
+  'الملاكمة الإيقاعية دمجت بين الرقص والقتال.',
+  'رياضة البولينج شعبية في الولايات المتحدة والعالم.',
+  'رياضة التجديف مجهد يستخدم عضلات الجسم كاملة.',
+  'التزلج على الجليد رياضة شتوية جميلة ومتحدية.',
+  'التزلج على الثلج رياضة شتوية شعبية في دول الثلوج.',
+  'الدراجات رياضة تحمّل وسرعة وجمال مناظر.',
+  'سباق التور دو فرانس أعظم سباق للدراجات في العالم.',
+  'اليوغا فن هندي قديم للتأمل والتوازن الجسدي والذهني.',
+  'الزومبا برنامج رياضي لاتيني ممتع يجمع الرقص والرياضة.',
+  'الكيك بوكسينج يجمع بين الملاكمة وركلات الكاراتيه.',
+  'السباحة تقوي جميع عضلات الجسم وتنشّط الرئتين.',
+  'المشي السريع يُعدّ من أفضل الرياضات لصحة القلب.',
+  'اللياقة البدنية تعني الجمع بين القوة والمرونة والتحمل.',
+  'منتخب مصر لكرة القدم الفراعنة فاز ببطولة أفريقيا 7 مرات.',
+  'أندية الإسماعيلي والأهلي والزمالك تاريخ الكرة المصرية.',
+  'الأهلي المصري من أكثر الأندية العربية والأفريقية تتويجاً.',
+  'الزمالك المصري بطل أفريقيا مرات عديدة.',
+  'البطولة الأفريقية لكرة القدم كأس أمم أفريقيا.',
+  'بطولة دوري أبطال أفريقيا منافسة بين أندية القارة.',
+  'كأس العرب لكرة القدم بطولة للمنتخبات العربية.',
+  'الكرة الطائرة الشاطئية رياضة صيفية شعبية.',
+  'كرة الماء رياضة مائية جماعية تجمع بين السباحة والتهديف.',
+  'رياضة قفز الحواجز تتطلب قوةً ودقةً وتنسيقاً.',
+  'الخماسي الحديث يشمل 5 رياضات: سباحة وفروسية وإطلاق نار ومبارزة وعدو.',
+  'الثلاثي الشامل (Triathlon) يجمع سباحة وركوب دراجة وعدوً.',
+  'كأس العالم للأندية يجمع أبطال القارات الست.',
+  'قطر استضافت كأس العالم 2022م وكانت الأولى عربياً.',
+  'السعودية استضافت كأس العالم 2034م.',
+  'كرة القدم النسائية تنمو بسرعة في العالم.',
+  'المنتخب الأمريكي النسائي الأكثر فوزاً بكأس العالم النسائي.',
+  'دوري أبطال أوروبا أعظم بطولة في كرة القدم.',
+  'ليفربول وريال مدريد وباييرن ميونخ من أعظم أندية أوروبا.',
+  'آرسنال وتشيلسي ومانشستر يونايتد أندية إنجليزية عريقة.',
+  'يوفنتوس وإنتر ميلان وميلان ثالوث الكرة الإيطالية.',
+  'باييرن ميونخ يهيمن على الدوري الألماني سنوات طويلة.',
+  'باريس سان جيرمان يهيمن على الكرة الفرنسية.',
+  'العين الإماراتي أول نادٍ خليجي يصل لنهائي كأس العالم للأندية.',
+  'الهلال والنصر والاتحاد والأهلي أندية السعودية الكبرى.',
+  'النجم الساحلي التونسي بطل أفريقيا مرات عديدة.',
+  'الوداد المغربي من أقوى الأندية المغاربية.',
+  'الترجي التونسي بطل أفريقيا أكثر من مرة.',
+  'رابطة أبطال أفريقيا (CAF Champions League) البطولة الأفريقية الكبرى.',
+  'كأس الكونفيدرالية الأفريقية البطولة الأفريقية الثانية.',
+  'المغرب 2030 ستستضيف كأس العالم مشتركةً مع إسبانيا والبرتغال.',
+  'بطولة اليورو بطولة المنتخبات الأوروبية كل 4 سنوات.',
+  'الاتحاد الأوروبي لكرة القدم UEFA يدير كرة القدم الأوروبية.',
+  'الاتحاد الدولي لكرة القدم FIFA يدير كرة القدم عالمياً.',
+  'الكمبيوتر الأول ENIAC وُضع عام 1945م وكان يملأ غرفة كاملة.',
+  'المعالج (CPU) دماغ الكمبيوتر الذي ينفذ العمليات الحسابية.',
+  'الذاكرة العشوائية (RAM) تخزن البيانات مؤقتاً أثناء التشغيل.',
+  'القرص الصلب (HDD) يخزن البيانات بشكل دائم.',
+  'محرك الأقراص الصلبة SSD أسرع من HDD لأنه لا يحتوي أجزاء متحركة.',
+  'نظام التشغيل Windows من أكثر أنظمة التشغيل انتشاراً.',
+  'نظام macOS من أبل يُعد نظيفاً وسهل الاستخدام.',
+  'لينكس نظام تشغيل مفتوح المصدر يستخدمه المبرمجون.',
+  'أندرويد نظام تشغيل للهواتف يعمل على 3 مليار جهاز.',
+  'iOS نظام أبل للهواتف معروف بسلاسته وأمانه.',
+  'المتصفح أداة للتصفح على الإنترنت مثل كروم وفايرفوكس.',
+  'كروم أكثر متصفحات الإنترنت استخداماً في العالم.',
+  'HTML لغة بناء صفحات الويب الأساسية.',
+  'CSS لغة تصميم وتنسيق صفحات الويب.',
+  'JavaScript لغة برمجة تجعل صفحات الويب تفاعلية.',
+  'Python لغة برمجة سهلة شائعة في الذكاء الاصطناعي وتحليل البيانات.',
+  'Java لغة برمجة تعمل على جميع الأنظمة.',
+  'C++ لغة برمجة قوية تستخدم في الألعاب والأنظمة.',
+  'SQL لغة قواعد البيانات للاستعلام عن المعلومات.',
+  'الخوارزمية سلسلة خطوات منطقية لحل مشكلة.',
+  'قاعدة البيانات مستودع منظم للمعلومات.',
+  'السحابة الإلكترونية (Cloud) تخزين البيانات عبر الإنترنت.',
+  'أمازون AWS من أكبر مزودي الخدمات السحابية.',
+  'مايكروسوفت أسسها بيل غيتس ولها منتجات تكنولوجية ضخمة.',
+  'أبل أسسها ستيف جوبز وطوّرت الحاسب الشخصي والآيفون.',
+  'غوغل بدأت محرك بحث ثم توسعت لتشمل كل التقنية.',
+  'أمازون بدأت متجراً للكتب ثم صارت إمبراطورية رقمية.',
+  'الشبكة العنكبوتية (WWW) اخترعها تيم بيرنرز لي عام 1989م.',
+  'بروتوكول الإنترنت IP عنوان فريد لكل جهاز متصل.',
+  'البريد الإلكتروني اخترعه راي توملينسون عام 1971م.',
+  'التشفير علم حماية البيانات من التجسس.',
+  'الجدار الناري (Firewall) يحمي الشبكة من الاختراقات.',
+  'الفيروس الإلكتروني برنامج ضار ينتشر بدون إذن.',
+  'مكافح الفيروسات برنامج يرصد ويحذف البرامج الضارة.',
+  'الهاكر مصطلح يشير للمبرمج الذي يخترق الأنظمة.',
+  'الأمن السيبراني حماية الأنظمة والبيانات من الاختراق.',
+  'التشفير ثنائي العامل يزيد أمان الحسابات الرقمية.',
+  'الروبلوكس ومايكرافت ألعاب تعليمية تنمي التفكير الإبداعي.',
+  'الواقع الافتراضي VR تقنية تنقلك لعالم رقمي محاكى.',
+  'الواقع المعزز AR تقنية تضيف عناصر رقمية للعالم الحقيقي.',
+  'تقنية البلوك تشين (Blockchain) تضمن شفافية المعاملات.',
+  'العملات المشفرة كالبيتكوين تعتمد على تقنية البلوك تشين.',
+  'الميتافيرس عالم افتراضي ثلاثي الأبعاد يعيش فيه المستخدمون.',
+  'نماذج اللغة الكبيرة (LLMs) ثورة في الذكاء الاصطناعي.',
+  'ChatGPT نموذج ذكاء اصطناعي أطلقته شركة OpenAI.',
+  'الروبوتات الصناعية تستبدل البشر في المهام الخطرة والمتكررة.',
+  'الطائرات المسيّرة (Drones) تُستخدم في التصوير والتوصيل.',
+  'السيارات الكهربائية تستخدم بطاريات بدلاً من الوقود التقليدي.',
+  'تسلا أكثر مصنعي السيارات الكهربائية شهرةً.',
+  'محركات البحث تُفهرس مليارات صفحات الويب.',
+  'خوارزمية الترتيب تحدد ما يظهر أولاً في نتائج البحث.',
+  'التسوق الإلكتروني غيّر عادات الاستهلاك في العالم.',
+  'التوصيل السريع من خدمات أمازون وشركاء آخرين.',
+  'تطبيق أوبر غيّر قطاع التنقل والسيارات الأجرة.',
+  'تطبيق إير بي أند بي غيّر قطاع الفنادق والإقامة.',
+  'نتفليكس غيّر صناعة الترفيه وأسقط دور الأقراص.',
+  'سبوتيفاي غيّر استهلاك الموسيقى بالبث المباشر.',
+  'الألعاب الإلكترونية صناعة أكبر من صناعتي الأفلام والموسيقى.',
+  'إي-سبورتس (الرياضات الإلكترونية) جذبت ملايين المشاهدين.',
+  'يوتيوب أكبر منصة فيديو في العالم مع 2 مليار مستخدم.',
+  'تيك توك منصة فيديو قصير صينية اكتسحت العالم.',
+  'إنستغرام منصة صور وفيديو ضمن مجموعة ميتا.',
+  'لينكدإن منصة التواصل المهني الأشهر عالمياً.',
+  'واتساب تطبيق المراسلة الأكثر استخداماً في العالم.',
+  'تيليغرام منصة مراسلة تتميز بسرعتها وأمانها.',
+  'سناب شات تطبيق صور ذات حياة قصيرة.',
+  'البودكاست وسيلة إعلامية صوتية شعبية.',
+  'المدونات أتاحت للجميع نشر المحتوى على الإنترنت.',
+  'الكتاب الإلكتروني يُقرأ على الأجهزة بدلاً من الورق.',
+  'الصحة الرقمية تشمل تطبيقات اللياقة وتتبع الصحة.',
+  'أجهزة تتبع النشاط كـ Fitbit وApple Watch صارت شائعة.',
+  'التعليم الإلكتروني غيّر شكل التعليم في الجامعات.',
+  'كورسيرا وإيديكس ويوديمي من أكبر منصات التعليم الإلكتروني.',
+  'خان أكاديمي منصة تعليمية مجانية للجميع.',
+  'طباعة 3D تُستخدم في الطب لصنع أطراف صناعية.',
+  'الشرائح الإلكترونية أصغر حجماً وأسرع أداءً كل عام.',
+  'قانون مور يقول إن عدد الترانزيستورات يتضاعف كل عامين.',
+  'الترانزيستور أصغر من ذرات الهيدروجين في أحدث الشرائح.',
+  'الكمبيوتر الكمي يستخدم مبادئ الكم للحسابات الضخمة.',
+  'مواصفات USB تتطور: من USB 2.0 إلى USB 4.0.',
+  'الشبكة 5G تُوفر سرعات إنترنت أسرع بعشرات المرات من 4G.',
+  'إنترنت الأشياء (IoT) يربط الأجهزة المنزلية بالإنترنت.',
+  'السيارات ذاتية القيادة تعتمد على الذكاء الاصطناعي والحساسات.',
+  'الطائرات الفضائية تعيد استخدامها شركة SpaceX.',
+  'إيلون ماسك مؤسس تسلا وسبيس إكس ومستحوذ على تويتر.',
+  'جيف بيزوس مؤسس أمازون وشركة بلو أوريجن الفضائية.',
+  'ستيف جوبز من أكثر العقول التكنولوجية تأثيراً في القرن العشرين.',
+  'بيل غيتس أسس مايكروسوفت وتبرع لملايين الأشخاص.',
+  'شاشات OLED تعطي ألواناً أكثر حيوية وعمقاً من LCD.',
+  'الكاميرات في الهواتف تجاوزت في كثير من الحالات الكاميرات الاحترافية.',
+  'الترجمة الآلية تقدمت كثيراً بفضل نماذج اللغة الكبيرة.',
+  'التعرف على الوجه تقنية تستخدم في الأمن والهواتف.',
+  'تقنية NFC تتيح الدفع بلمس الهاتف بالجهاز.',
+  'المدفوعات الرقمية تنمو على حساب النقد التقليدي.',
+  'بطاريات الليثيوم تُشغّل الهواتف والسيارات الكهربائية.',
+  'الطاقة الشمسية تحولت من باهظة لرخيصة خلال عقد واحد.',
+  'الكهرباء الذكية (Smart Grid) تدير توزيع الطاقة بذكاء.',
+  'المنازل الذكية تتحكم فيها بهاتفك من أي مكان.',
+  'المساعد الصوتي (سيري وأليكسا) يُجيب عن أسئلتك بالصوت.',
+  'جسم الإنسان يتكون من 37 تريليون خلية.',
+  'الجلد أكبر أعضاء الجسم ويغطي 1.7 متر مربع في المتوسط.',
+  'العظام تتجدد كلياً كل 10 سنوات تقريباً.',
+  'الأسنان أصلب أجزاء جسم الإنسان.',
+  'الكبد يؤدي أكثر من 500 وظيفة في الجسم.',
+  'الكلى تصفي 200 لتر من الدم يومياً.',
+  'الدماغ البشري يحتوي على 86 مليار خلية عصبية.',
+  'العين البشرية تميز بين 10 ملايين لون مختلف.',
+  'الأذن البشرية تستطيع سماع ترددات من 20 إلى 20000 هرتز.',
+  'الأنف يستطيع التمييز بين تريليون رائحة مختلفة.',
+  'الدم يتكون من خلايا حمراء وبيضاء وصفائح دموية وبلازما.',
+  'كريات الدم الحمراء تعيش 120 يوماً ثم تُدمَّر في الطحال.',
+  'كريات الدم البيضاء هي جيش الجسم ضد الأمراض.',
+  'الإنسان يأخذ حوالي 23000 نفس في اليوم.',
+  'القلب يضرب بين 60 و100 مرة في الدقيقة.',
+  'الإنسان يكسب نصف وزن جسمه في طعام كل يوم.',
+  'الكالوري وحدة قياس الطاقة في الطعام.',
+  'الدهون الصحية كزيت الزيتون ضرورية لصحة الدماغ.',
+  'البروتين أساس بناء العضلات والخلايا.',
+  'الكربوهيدرات المصدر الرئيسي للطاقة في جسم الإنسان.',
+  'الألياف الغذائية تساعد على الهضم وتنظيم السكر.',
+  'فيتامين D يتكوّن في الجلد عند التعرض للشمس.',
+  'فيتامين C يقوي المناعة ويجدد خلايا الجلد.',
+  'الحديد ضروري لصنع كريات الدم الحمراء.',
+  'المغنيسيوم يساعد على الاسترخاء ونوعية النوم.',
+  'أوميغا 3 دهون مفيدة موجودة في الأسماك وتحمي القلب.',
+  'الماء يشكّل 60٪ من وزن جسم الإنسان.',
+  'شرب 8 أكواب ماء يومياً توصية صحية شائعة.',
+  'الجفاف يُضعف التركيز والأداء قبل أن تشعر بالعطش.',
+  'ممارسة 150 دقيقة رياضة أسبوعياً توصية منظمة الصحة العالمية.',
+  'النوم 7-9 ساعات يومياً يدعم صحة القلب والمخ.',
+  'ضغط الدم الطبيعي 120/80 ملم زئبق.',
+  'كوليسترول HDL مفيد وLDL الزائد ضار.',
+  'السكري النوع الأول مناعي ذاتي والنوع الثاني مرتبط بأسلوب الحياة.',
+  'السرطان نمو غير منضبط للخلايا يمكن الوقاية منه جزئياً.',
+  'الاكتئاب مرض حقيقي يحتاج علاجاً طبياً ليس ضعف شخصية.',
+  'القلق الزائد يضر القلب والهضم والنوم.',
+  'الضحك يُفرز هرمونات تُحسّن الصحة والمناعة.',
+  'الموسيقى تُهدّئ الأعصاب وتُخفف الألم.',
+  'التأمل يُقلص مستوى هرمون التوتر (الكورتيزول).',
+  'الإدمان على الهاتف يُقلل التركيز والنوم الجيد.',
+  'التسمم الغذائي يسببه البكتيريا في الطعام الفاسد.',
+  'الحساسية رد فعل مناعي مبالغ تجاه مواد غير ضارة.',
+  'الربو التهاب في الشعب الهوائية يُعاني منه 300 مليون شخص.',
+  'ارتفاع ضغط الدم \'القاتل الصامت\' يضر القلب والكلى.',
+  'الكولون (القولون) يستضيف 70٪ من خلايا المناعة.',
+  'الميكروبيوم المعوي يؤثر على المزاج والمناعة والهضم.',
+  'الخلايا الجذعية تستطيع التحول إلى أي خلية في الجسم.',
+  'الاستنساخ البشري ممنوع أخلاقياً وقانونياً في معظم الدول.',
+  'تقنية CRISPR تُتيح تعديل الجينات بدقة فائقة.',
+  'العقل السليم في الجسم السليم حكمة لا تُنكَر.',
+  'من جهل شيئاً عاداه.',
+  'الصبر مفتاح الفرج.',
+  'في التأني السلامة وفي العجلة الندامة.',
+  'لو لم يكن الصبر من أسباب الفرج لما صبر أيوب على ما ابتُلي.',
+  'خير الكلام ما قلّ ودلّ.',
+  'الوقت كالسيف إن لم تقطعه قطعك.',
+  'طلب العلم من المهد إلى اللحد.',
+  'الإنسان بخلقه لا بثيابه.',
+  'ليس الجمال من الوجه الجميل بل الجمال جمال العلم والأدب.',
+  'الكريم من يعطي في الشدة لا في الرخاء.',
+  'أفضل الناس من نفع الناس.',
+  'التقوى رأس كل حكمة.',
+  'الحياء لا يأتي إلا بخير.',
+  'من صمت نجا.',
+  'من كثر كلامه كثر خطأه.',
+  'قل الحق ولو كان مراً.',
+  'الصادق ينظر بقلبه قبل أن ينظر بعينيه.',
+  'الحق ثقيل لكن الباطل أثقل.',
+  'اعمل لدنياك كأنك تعيش أبداً واعمل لآخرتك كأنك تموت غداً.',
+  'اقرأ فأول كلمة في القرآن كانت اقرأ.',
+  'من أراد الدنيا فعليه بالعلم ومن أراد الآخرة فعليه بالعلم.',
+  'ليس الغنى عن كثرة العرض إنما الغنى غنى النفس.',
+  'رحم الله امرأً عرف قدر نفسه.',
+  'كن لما لا تأمل أرجى منك لما تأمل.',
+  'اللهم لا سهل إلا ما جعلته سهلاً.',
+  'ومن يتوكل على الله فهو حسبه.',
+  'ربنا لا تُحملنا ما لا طاقة لنا به.',
+  'يُسر بعد عسر نعم ربي ما أكرم.',
+  'كل نفس بما كسبت رهينة.',
+  'خيركم من تعلم القرآن وعلّمه.',
+  'من سلك طريقاً يلتمس فيه علماً سهّل الله له به طريقاً إلى الجنة.',
+  'خير الصدقة على ذي الرحم الكاشح.',
+  'الراحمون يرحمهم الرحمن ارحموا من في الأرض يرحمكم من في السماء.',
+  'المسلم من سلم المسلمون من لسانه ويده.',
+  'المؤمن القوي خير وأحب إلى الله من المؤمن الضعيف.',
+  'احرص على ما ينفعك واستعن بالله ولا تعجز.',
+  'الدعاء سلاح المؤمن.',
+  'أفضل الذكر لا إله إلا الله.',
+  'أقرب ما يكون العبد من ربه وهو ساجد.',
+  'الغيبة تبطل الصيام وتمحو الأجر.',
+  'من غشنا فليس منا.',
+  'الدنيا سجن المؤمن وجنة الكافر.',
+  'كل ابن آدم خطاء وخير الخطائين التوابون.',
+  'قدر لا يُردّ بالسخط ولا يُستزاد بالرضا.',
+  'الخير في أن تكون راضياً عمّا قسم الله لك.',
+  'إياك والكسل فإنه باب كل شر.',
+  'من حسن إسلام المرء تركه ما لا يعنيه.',
+  'البخل والجبن والحرص من شيمة الجاهل.',
+  'ابن آدم إنك لا تنفق شيئاً إلا خلف الله عليك.',
+  'لن تُحبّ شخصاً حقاً حتى تُحبّ له ما تُحبّ لنفسك.',
+  'المرء على دين خليله فلينظر من يُخالل.',
+  'أحب الأعمال إلى الله أدومها وإن قلّ.',
+  'تواضع لله يرفعك الله.',
+  'العلم نور والجهل ظلام.',
+  'ولكي تنجح في حياتك لا تفقد قيمك الأساسية.',
+  'الحكيم يتعلم من أخطاء غيره والعاقل من أخطائه والجاهل لا يتعلم.',
+  'الأفعال تُعبّر عن الناس أكثر من الكلمات.',
+  'الذكاء هدية لكن الطيبة اختيار.',
+  'الفرصة تأتي لمن يعمل باجتهاد.',
+  'لا يُقدَّر أحد على أن يتعلم ما يظن أنه يعرفه مسبقاً.',
+  'كل يوم هو فرصة جديدة لتكون نسخة أفضل.',
+  'الإيجابية لا تعني تجاهل المشاكل بل مواجهتها بعزيمة.',
+  'الشجرة التي تقاوم العواصف هي التي تضرب جذوراً أعمق.',
+  'النجاح ليس دائماً ما يمكنك رؤيته.',
+  'الوقت الثمين لا يُعوَّض فكن حكيماً في استثماره.',
+  'الثقة بالنفس لا تعني غياب الخوف بل تجاوزه.',
+  'التعلم المستمر أفضل استثمار في ذاتك.',
+  'الفضول يفتح أبواباً لا تعلم بوجودها.',
+  'لا تُقيّم يومك بالنجاح الحاصل بل بالبذور التي زرعت.',
+  'العادات تبني الشخصية ببطء ومنهجية.',
+  'اختر أصدقاءك بعناية فهم يُشكّلون تفكيرك.',
+  'الصحة مال لا ثمن له فلا تبيعه برخص.',
+  'الاحترام ليس ما تطلبه بل ما تعطيه.',
+  'خطوة صغيرة للأمام أفضل من ألف فكرة دون فعل.',
+  'الأخطاء سلّم التعلم لمن يُدرك ذلك.',
+  'نجاح الآخرين مصدر إلهام لا مصدر حسد.',
+  'اصنع السعادة ولا تنتظرها.',
+  'ابتسامة لا تكلف شيئاً لكنها تعطي الكثير.',
+  'الرحلة الطويلة تبدأ بخطوة واحدة.',
+  'الأرنب يستطيع رؤية خلفه دون أن يدير رأسه.',
+  'الزرافة لسانها أسود ويبلغ طوله 45 سم.',
+  'الدب القطبي فراؤه شفاف وليس أبيض ويعكس الضوء.',
+  'الخفاش الوحيد من الثدييات القادر على الطيران.',
+  'النمر الأسرع من الأسد ولكن الأسد أقوى.',
+  'الحصان يستطيع النوم واقفاً.',
+  'البقرة لها 4 معدات للهضم.',
+  'الببغاء يستطيع التحدث لأن لسانه مرن وعضلاته قوية.',
+  'الأسماك لا تغلق عيونها أثناء النوم.',
+  'الكلب يشم الروائح بقدرة تفوق الإنسان 40 مرة.',
+  'القطة تقضي 70٪ من حياتها في النوم.',
+  'الفراشة تتذوق بأرجلها الست.',
+  'العنكبوت له 8 عيون وكل ثنائية لوظيفة مختلفة.',
+  'النملة تستطيع حمل 50 ضعف وزنها.',
+  'الديدان تُنمّي التربة وتُحسّن تهويتها.',
+  'النحلة إذا لسعت تموت لأنها تترك إبرتها في جلد الضحية.',
+  'الحيتان تغني وتتواصل بأصوات تُسمع على مئات الكيلومترات.',
+  'الخيار يتكون من 96٪ ماء.',
+  'البطيخ يتكون من 92٪ ماء.',
+  'الطماطم علمياً فاكهة لكن غذائياً تُصنَّف خضار.',
+  'الفراولة الوحيدة من الفواكه التي بذورها على الخارج.',
+  'الموز فاكهة تنمو على نبات عشبي وليس شجرة.',
+  'التفاح ينتمي لعائلة الورد.',
+  'الليمون يحتوي على سكر أكثر من الفراولة.',
+  'الشوكولاته مشتقة من حبوب الكاكاو.',
+  'القهوة ثاني أكثر السلع تداولاً في العالم بعد النفط.',
+  'الشاي أكثر المشروبات استهلاكاً في العالم بعد الماء.',
+  'الخبز أقدم غذاء مطبوخ صنعه الإنسان منذ 14000 سنة.',
+  'العسل لا يفسد أبداً ووُجد في مقابر الفراعنة صالحاً.',
+  'الملح كان ذهب العصور القديمة وكان يُدفع به للجنود.',
+  'الفلفل الأحمر يحتوي على فيتامين C أكثر من البرتقال.',
+  'الجزر برتقالي اللون بسبب مادة البيتا كاروتين.',
+  'السبانخ غنية بالحديد والمغنيسيوم والفيتامينات.',
+  'البروكلي يُعدّ من أكثر الخضروات قيمة غذائية.',
+  'الثوم يحتوي على مضادات حيوية طبيعية وخافض للضغط.',
+  'الزنجبيل مضاد طبيعي للالتهابات ومُسكّن للغثيان.',
+  'الكركم يحتوي على الكوركيومين مضاد التهاب قوي.',
+  'زيت الزيتون بكر ممتاز الأفضل لصحة القلب.',
+  'المكسرات غنية بالدهون الصحية والبروتين والمعادن.',
+  'اللوز يحتوي على كالسيوم وفيتامين E ودهون صحية.',
+  'الجوز غني بأحماض أوميغا 3 الدهنية.',
+  'الأفوكادو غني بالدهون الصحية والبوتاسيوم.',
+  'الكينوا بروتين كامل يحتوي على جميع الأحماض الأمينية.',
+  'العدس مصدر ممتاز للبروتين النباتي والحديد.',
+  'الحمص غني بالبروتين والألياف والمعادن.',
+  'الشوفان يُخفض الكوليسترول ويمد الجسم بالطاقة.',
+  'الأرز الأسمر أكثر فائدة من الأبيض لأنه يحتفظ بالنخالة.',
+  'البقوليات تُنمّي النيتروجين في التربة وتُحسّنها.',
+  'المانغو ملك الفواكه الاستوائية الغني بالفيتامينات.',
+  'الأناناس يحتوي على بروميلين إنزيم يساعد الهضم.',
+  'الكيوي يحتوي على فيتامين C أكثر من البرتقال.',
+  'التمر فاكهة عربية غنية بالطاقة والمعادن والألياف.',
+  'الرمان غني بمضادات الأكسدة ويحمي من أمراض القلب.',
+  'التوت غني بمضادات الأكسدة التي تحارب الشيخوخة.',
+  'الليمون الهندي (الجريب فروت) يتفاعل مع بعض الأدوية.',
+  'الكمثرى غنية بالألياف والبوتاسيوم وفيتامين K.',
+  'الكرز يحتوي على ميلاتونين الذي يُحسّن النوم.',
+  'الإجاص (البرقوق) يساعد على الهضم ويمنع الإمساك.',
+  'التين غني بالكالسيوم والبوتاسيوم ومضادات الأكسدة.',
+  'العنب يحتوي على ريسفيراترول مضاد شيخوخة طبيعي.',
+  'البيض الكامل يُعدّ من أكثر الأغذية اكتمالاً غذائياً.',
+  'السمك خاصة الدهني مثل السلمون والماكريل صحي جداً.',
+  'اللحم الأحمر المعتدل مصدر جيد للحديد والزنك.',
+  'الدجاج مصدر بروتين خالٍ من الدهون المشبعة.',
+  'الحليب يحتوي على الكالسيوم والبروتين والفيتامينات.',
+  'الزبادي يحتوي على بكتيريا نافعة تُحسّن صحة الأمعاء.',
+  'الجبن غني بالكالسيوم والبروتين لكن دهونه مرتفعة.',
+  'الشكولاتة الداكنة مضادات أكسدة وفيرة وتُحسّن المزاج.',
+  'الشاي الأخضر يحتوي على مضادات أكسدة وقليل كافيين.',
+  'القهوة تُحسّن التركيز وتقلل خطر بعض الأمراض.',
+  'عصير البرتقال الطازج أفضل من المعلب لاحتوائه على الألياف.',
+  'الماء الدافئ مع الليمون صباحاً ينشّط الجهاز الهضمي.',
+  'الصيام المتقطع يحسّن حساسية الإنسولين ويساعد على الوزن.',
+  'الأكل ببطء يقلل الكميات المستهلكة ويُحسّن الهضم.',
+  'تناول الفطور يُحسّن التركيز والأداء الصباحي.',
+  'العشاء الخفيف قبل ساعات من النوم يُحسّن نوعية النوم.',
+  'الأكل أمام الشاشة يزيد الكميات بدون وعي.',
+  'تحضير الطعام في المنزل أصح وأرخص من الطعام الجاهز.',
+  'الوجبات السريعة تحتوي على دهون متحولة ضارة بالقلب.',
+  'المشروبات الغازية تُفقد الكالسيوم من العظام.',
+  'السكر المضاف يُسبب الالتهابات ويُضعف المناعة.',
+  'الدهون المتحولة في الأطعمة المصنّعة تُسبب أمراض القلب.',
+  'الألوان الطبيعية في الخضروات تشير لمضادات أكسدة مختلفة.',
+  'كلما تنوعت الألوان في طبقك كلما تنوعت الفوائد.',
+  'الجوع ليس دائماً علامة على الجسم بل أحياناً علامة على العطش.',
+  'قبل الأكل اشرب كوب ماء لتقليل الشهية.',
+  'تناول الخضروات قبل الوجبة الرئيسية يُحسّن نسب السكر.',
+  'الأكل وفق التنوع والاعتدال هو المبدأ الصحي الذهبي.',
+  'الجسم يحتاج 20 دقيقة ليشعر بالشبع بعد الأكل.',
+  'مضغ الطعام جيداً يُحسّن الهضم ويرفع الاستفادة.',
+  'الملح يرفع ضغط الدم وينبغي تقليله لـ 5 جرام يومياً.',
+  'الدهون المشبعة في اللحوم الحمراء ترفع الكوليسترول الضار.',
+  'الألياف تُقلل امتصاص السكر والكوليسترول من الأمعاء.',
+  'البروتين يُبطئ الهضم ويمد الجسم بالطاقة لفترة أطول.',
+  'الفيتامينات والمعادن مكملات لنظام غذائي صحي متكامل.',
+  'المكملات الغذائية لا تُعوّض الأكل الصحي المتنوع.',
+  'الصحة الغذائية تُبنى على الاستمرارية لا الكمالية.',
+  'التنفس الأنفي أصح من الفمي لأن الأنف يُنقي الهواء ويرطبه.',
+  'الضغط النفسي المزمن يُضعف جهاز المناعة ويُسرّع الشيخوخة.',
+  'الضحك 15 دقيقة يومياً يُحسّن وظائف الأوعية الدموية.',
+  'الطبيعة والمناطق الخضراء تُقلل التوتر وتُحسّن المزاج.',
+  'الموسيقى الكلاسيكية تُحسّن التركيز أثناء الدراسة.',
+  'كتابة المشاعر في دفتر يُخفف القلق والاكتئاب.',
+  'أثمن شيء تملكه هو وقتك، فلا تضيعه بلا جدوى.',
+];
+
+
+function getDykIndex(){ return parseInt(localStorage.getItem('rmy_dyk_idx')||'0'); }
+function setDykIndex(i){ localStorage.setItem('rmy_dyk_idx', i); }
+function getDykShown(){ return localStorage.getItem('rmy_dyk_date')||''; }
+function setDykShown(d){ localStorage.setItem('rmy_dyk_date', d); }
+
+function getDykPool(){
+  // قائمة عشوائية لم تُعرض بعد - تُعاد عند استنفاد كل المعلومات
+  let pool = JSON.parse(localStorage.getItem('rmy_dyk_pool')||'null');
+  if(!pool || !pool.length){
+    pool = DYK_FACTS.map((_,i)=>i);
+    // خلط عشوائي (Fisher-Yates)
+    for(let i=pool.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [pool[i],pool[j]]=[pool[j],pool[i]];
+    }
+  }
+  return pool;
+}
+function saveDykPool(pool){ localStorage.setItem('rmy_dyk_pool', JSON.stringify(pool)); }
+
+function checkDyk(){
+  let pool = getDykPool();
+  const idx = pool.shift();
+  saveDykPool(pool);
+  const text = DYK_FACTS[idx];
+  const dykEl = document.getElementById('dykText');
+  if(dykEl) dykEl.textContent = text;
+  const inCsel = document.getElementById('dykInCselText');
+  const inCselBox = document.getElementById('dykInCsel');
+  if(inCsel) inCsel.textContent = text;
+  if(inCselBox) inCselBox.style.display = 'block';
+}
+
+function closeDyk(){
+  document.getElementById('dykOv').classList.add('hidden');
+}
+
+/* ── RANDOM QUESTION ── */
+let randQSession = {q:null, answered:false};
+
+function startRandQ(){
+  const allQ = [];
+  CATS.forEach(cat=>{ cat.q.forEach(q=>allQ.push({...q,cn:cat.name})); });
+  const q = allQ[Math.floor(Math.random()*allQ.length)];
+  randQSession = {q, answered:false};
+
+  document.getElementById('randQText').textContent = q.q;
+  document.getElementById('randQFeedback').textContent = '';
+  document.getElementById('randQFeedback').style.color = '';
+  document.getElementById('randQNextBtn').style.display = 'none';
+
+  const optsDiv = document.getElementById('randQOpts');
+  const fillDiv = document.getElementById('randQFill');
+  optsDiv.innerHTML = '';
+
+  if(q.type==='mcq'){
+    fillDiv.style.display = 'none';
+    optsDiv.style.display = 'flex';
+    q.opts.forEach((opt,i)=>{
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.textContent = opt;
+      btn.onclick = ()=>checkRandQMCQ(i, btn, q.opts);
+      optsDiv.appendChild(btn);
+    });
+  } else {
+    optsDiv.style.display = 'none';
+    fillDiv.style.display = 'block';
+    document.getElementById('randQInput').value = '';
+    setTimeout(()=>document.getElementById('randQInput')?.focus(),300);
+  }
+
+  document.getElementById('randQOv').classList.remove('hidden');
+}
+
+function checkRandQMCQ(i, btn, opts){
+  if(randQSession.answered) return;
+  randQSession.answered = true;
+  const correct = randQSession.q.a;
+  const fb = document.getElementById('randQFeedback');
+  document.querySelectorAll('#randQOpts .opt-btn').forEach((b,j)=>{
+    b.disabled = true;
+    if(j===correct) b.style.background = 'var(--green)';
+    if(j===i && i!==correct) b.style.background = 'var(--coral)';
+  });
+  if(i===correct){ fb.textContent='✅ إجابة صحيحة!'; fb.style.color='var(--green)'; }
+  else { fb.textContent='❌ الإجابة الصحيحة: '+opts[correct]; fb.style.color='var(--coral)'; }
+  document.getElementById('randQNextBtn').style.display = 'block';
+}
+
+function checkRandQ(){
+  if(randQSession.answered) return;
+  randQSession.answered = true;
+  const input = document.getElementById('randQInput').value.trim();
+  const accept = randQSession.q.accept||[];
+  const ok = accept.some(a=>input.replace(/\s/g,'').toLowerCase()===a.replace(/\s/g,'').toLowerCase());
+  const fb = document.getElementById('randQFeedback');
+  if(ok){ fb.textContent='✅ إجابة صحيحة!'; fb.style.color='var(--green)'; }
+  else { fb.textContent='❌ الإجابة الصحيحة: '+accept[0]; fb.style.color='var(--coral)'; }
+  document.getElementById('randQNextBtn').style.display = 'block';
+}
+
+function closeRandQ(){
+  document.getElementById('randQOv').classList.add('hidden');
+}
+
+/* ── FINISH SESSION (ENHANCED) ── */
+function finishSessExtra(){
+  const btns = document.getElementById('summaryBtns');
+  btns.innerHTML = '';
+
+  if(session.mode==='cat'){
+    const cat = CATS.find(c=>c.id===session.catId);
+    const isFree = FREE_CATS.includes(session.catId);
+    const isLimited = !isPremium && isFree;
+
+    // رسالة التشجيع على الاشتراك للنسخة المجانية
+    if(isLimited){
+      const msg = document.createElement('div');
+      msg.style.cssText = 'background:var(--cream);border-radius:16px;padding:16px;margin-bottom:14px;text-align:right;border:1.5px solid var(--gold);';
+      msg.innerHTML = '<p style="margin:0 0 8px;font-size:14px;font-weight:700;color:var(--teal);">🎉 أحسنت! لقد أنهيت جميع الأسئلة المجانية في هذا المجال.</p><p style="margin:0;font-size:13px;color:var(--teal-light);line-height:1.8;">يمكنك الاستمرار في مجالات أخرى، أو فتح النسخة الكاملة للوصول إلى جميع الأسئلة والتحديات اليومية.</p>'
+      btns.appendChild(msg);
+
+      const btnUp = document.createElement('button');
+      btnUp.className = 'btn btn-gold';
+      btnUp.textContent = '⭐ اشترك للنسخة الكاملة';
+      btnUp.onclick = showUpgr;
+      btns.appendChild(btnUp);
+    } else {
+      const btn1 = document.createElement('button');
+      btn1.className = 'btn btn-gold';
+      btn1.textContent = '🔄 خمس أسئلة أخرى من نفس المجال';
+      btn1.onclick = ()=>startCat(session.catId);
+      btns.appendChild(btn1);
+    }
+
+    const btn2 = document.createElement('button');
+    btn2.className = 'btn btn-outline';
+    btn2.textContent = '📚 اختيار مجال آخر';
+    btn2.onclick = ()=>{ goHome(); setTimeout(()=>document.getElementById('gridAnchor').scrollIntoView({behavior:'smooth'}),200); };
+    btns.appendChild(btn2);
+  }
+
+  const btn3 = document.createElement('button');
+  btn3.className = session.mode==='cat'?'btn btn-ghost btn-sm':'btn btn-gold';
+  btn3.textContent = '🏠 العودة للرئيسية';
+  btn3.onclick = goHome;
+  btns.appendChild(btn3);
+}
+
+
+/* ── FAMILY QUESTION ── */
+const FAMILY_QUESTIONS = [
+  'اسأل والدك: ما أصعب مادة كنت تدرسها؟',
+  'اسأل والدتك: ما أكثر كتاب أثر في حياتك؟',
+  'اسأل جدك: كيف كانت المدرسة في طفولتك؟',
+  'اسأل أحد أفراد العائلة: ما أول وظيفة عملت بها؟',
+  'اسأل أحد أفراد العائلة: ما النصيحة التي كنت تتمنى أن تسمعها وأنت في عمرك الحالي؟',
+  'اسأل أحد أفراد العائلة: ما أكثر موقف مضحك تتذكره من أيام المدرسة؟',
+  'اسأل أحد أفراد العائلة: إذا كان بإمكانك تعلم مهارة جديدة اليوم، ماذا ستختار؟',
+  'اسأل أحد أفراد العائلة: ما المكان الذي تحلم بزيارته ولماذا؟',
+  'اسأل أحد أفراد العائلة: ما أكثر اختراع غيّر حياتك؟',
+  'اسأل أحد أفراد العائلة: ما أجمل عادة تعلمتها من والديك؟',
+  'اسأل والدتك: ما أول طبخة تعلمتِ إعدادها؟',
+  'اسأل والدك: من كان قدوتك وأنت صغير؟',
+  'اسأل جدتك: ما أجمل ذكرى من شبابها؟',
+  'اسأل أحد أفراد العائلة: ما أكثر مكان يحب زيارته في المدينة؟',
+  'اسأل أحد أفراد العائلة: ما الفيلم أو المسلسل المفضل لديه ولماذا؟',
+  'اسأل أحد أفراد العائلة: كيف كانت الألعاب في طفولته؟',
+  'اسأل والدك: ما أهم قرار اتخذته في حياتك؟',
+  'اسأل والدتك: ما أكثر شيء تفتخر به فيّ؟',
+  'اسأل جدك: كيف كانت وسائل المواصلات قديماً؟',
+  'اسأل جدتك: ما الأكلة التي كانت تُطهى في المناسبات؟',
+  'اسأل أحد أفراد العائلة: ما هوايته المفضلة منذ الصغر؟',
+  'اسأل أحد أفراد العائلة: ما أكثر رحلة سافر إليها وأعجبته؟',
+  'اسأل أحد أفراد العائلة: من هو صديق طفولته الذي ما زال يتذكره؟',
+  'اسأل أحد أفراد العائلة: ما أول هدية اشتراها بماله الخاص؟',
+  'اسأل والدك: ما أكثر شيء تعلمته من والدك (جدي)؟',
+  'اسأل والدتك: ما أكثر شيء تعلمتِه من والدتك (جدتي)؟',
+  'اسأل أحد أفراد العائلة: ما أكبر تحدٍ واجهه في حياته؟',
+  'اسأل أحد أفراد العائلة: ما القيمة التي يتمنى أن أتعلمها في حياتي؟',
+  'اسأل أحد أفراد العائلة: ما أكثر شيء يشكر الله عليه؟',
+  'اسأل أحد أفراد العائلة: ما حلمه الذي لم يتحقق بعد؟',
+  'اسأل جدك: كيف كان الاحتفال بالأعياد قديماً؟',
+  'اسأل جدتك: ما أجمل نصيحة أعطتها لك أمها؟',
+  'اسأل أحد أفراد العائلة: ما أول شيء يتذكره من طفولته؟',
+  'اسأل أحد أفراد العائلة: ما الرياضة التي كان يمارسها في شبابه؟',
+  'اسأل أحد أفراد العائلة: ما أغرب طعام تذوقه في حياته؟',
+  'اسأل أحد أفراد العائلة: من أكثر شخص أثّر في حياته؟',
+  'اسأل أحد أفراد العائلة: ما أول لغة أجنبية تعلمها؟',
+  'اسأل أحد أفراد العائلة: ما أكثر أغنية تذكره بذكرى جميلة؟',
+  'اسأل والدك: ما أكثر لحظة فخر عشتها معي؟',
+  'اسأل والدتك: ما أكثر لحظة فخر عشتِها معي؟',
+  'اسأل أحد أفراد العائلة: ما أكثر مدينة أو دولة يتمنى العيش فيها؟',
+  'اسأل أحد أفراد العائلة: ما أكثر مهنة كان يتمنى أن يعمل بها؟',
+  'اسأل أحد أفراد العائلة: كيف يقضي وقت فراغه المفضل؟',
+  'اسأل أحد أفراد العائلة: ما أكثر شيء يجعله يضحك؟',
+  'اسأل أحد أفراد العائلة: ما نصيحته لي بخصوص الصداقة؟',
+  'اسأل أحد أفراد العائلة: ما نصيحته لي بخصوص الدراسة؟',
+  'اسأل أحد أفراد العائلة: ما أكثر شيء يقدّره في العائلة؟',
+  'اسأل أحد أفراد العائلة: كيف كان يقضي عطلة الصيف في طفولته؟',
+  'اسأل أحد أفراد العائلة: ما أكثر موقف تعلّم منه درساً في حياته؟',
+  'اسأل أحد أفراد العائلة: ما رأيه في أهم اختراع في حياته؟',
+];
+
+function getFamilyPool(){
+  let pool = JSON.parse(localStorage.getItem('rmy_family_pool')||'null');
+  if(!pool || !pool.length){
+    pool = FAMILY_QUESTIONS.map((_,i)=>i);
+    for(let i=pool.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [pool[i],pool[j]]=[pool[j],pool[i]];
+    }
+  }
+  return pool;
+}
+function saveFamilyPool(pool){ localStorage.setItem('rmy_family_pool', JSON.stringify(pool)); }
+
+function getFamilyQDate(){ return localStorage.getItem('rmy_family_date')||''; }
+function setFamilyQDate(d){ localStorage.setItem('rmy_family_date', d); }
+function getFamilyQIdx(){ return localStorage.getItem('rmy_family_today_idx'); }
+function setFamilyQIdx(i){ localStorage.setItem('rmy_family_today_idx', i); }
+function getFamilyQDone(){ return localStorage.getItem('rmy_family_done_date')||''; }
+function setFamilyQDone(d){ localStorage.setItem('rmy_family_done_date', d); }
+
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+function ensureTodayFamilyQ(){
+  const today = todayStr();
+  if(getFamilyQDate()!==today){
+    let pool = getFamilyPool();
+    const idx = pool.shift();
+    saveFamilyPool(pool);
+    setFamilyQDate(today);
+    setFamilyQIdx(idx);
+  }
+  return FAMILY_QUESTIONS[parseInt(getFamilyQIdx())];
+}
+
+function updateFamilyQBadge(){
+  const chk = document.getElementById('familyQCheck');
+  if(!chk) return;
+  chk.style.display = (getFamilyQDone()===todayStr()) ? 'inline' : 'none';
+}
+
+function startFamilyQ(){
+  const q = ensureTodayFamilyQ();
+  document.getElementById('familyQText').textContent = q;
+  document.getElementById('familyQOv').classList.remove('hidden');
+}
+
+function closeFamilyQ(){
+  document.getElementById('familyQOv').classList.add('hidden');
+}
+
+function doneFamilyQ(){
+  setFamilyQDone(todayStr());
+  document.getElementById('familyQOv').classList.add('hidden');
+  document.getElementById('familyQSuccessOv').classList.remove('hidden');
+  updateFamilyQBadge();
+}
+
+function closeFamilyQSuccess(){
+  document.getElementById('familyQSuccessOv').classList.add('hidden');
+  goHome();
+}
 
 /* ── INIT ── */
 (function(){
