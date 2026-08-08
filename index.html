@@ -2370,6 +2370,7 @@ function renderQ(){
   if(q.type==='mcq'){html+='<div class="choices">';q.opts.forEach((o,i)=>html+=`<div class="choice" onclick="answerMcq(${i})">${esc(String(o))}</div>`);html+='</div>';}
   else if(q.type==='fill')html+=`<div class="fillrow"><input type="text" id="fi" placeholder="اكتب إجابتك..." onkeydown="if(event.key==='Enter')answerFill()"><button class="btn btn-gold btn-sm" onclick="answerFill()">تأكيد</button></div>`;
   area.innerHTML=html;
+  window.scrollTo(0,0);
   if(q.type==='fill')setTimeout(()=>document.getElementById('fi')?.focus(),50);
 }
 function lockC(){document.querySelectorAll('.choice').forEach(el=>el.classList.add('disabled'));}
