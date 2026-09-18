@@ -2031,6 +2031,7 @@ function closeAbout(){ document.getElementById('aboutOverlay').classList.add('hi
 
 /* ── ACTIVATION CODE ── */
 const _SALT='RMY2026ISK';
+const _GROUP_SALT='RMYGROUP2026SHARED';
 function getDeviceId(){
   let id=localStorage.getItem('rmy_device_id');
   if(!id){
@@ -2116,22 +2117,39 @@ function generateCode(deviceId,dateStr,days){
   const daysPart=parseInt(days).toString(36).toUpperCase().padStart(3,'0');
   return daysPart+hashPart;
 }
+function checkGroupCode(input){
+  /* كود جماعي: 9 أحرف تبدأ بـG، صالح على أي جهاز حتى تاريخ ثابت — يُولّد من admin.html */
+  if(input.length!==9||input.charAt(0)!=='G') return null;
+  const datePart=input.slice(1,5);
+  const hashPart=input.slice(5,9);
+  const ymdNum=parseInt(datePart,36);
+  if(!ymdNum||isNaN(ymdNum)) return null;
+  const ymd=ymdNum.toString().padStart(6,'0');
+  const raw='GROUP'+ymd+_GROUP_SALT;
+  let hash=5381;
+  for(let i=0;i<raw.length;i++){hash=((hash<<5)+hash)+raw.charCodeAt(i);hash|=0;}
+  const expectedHash=Math.abs(hash).toString(36).toUpperCase().slice(0,4);
+  if(hashPart!==expectedHash) return null;
+  const yy=parseInt(ymd.slice(0,2),10);
+  const mm=parseInt(ymd.slice(2,4),10);
+  const dd=parseInt(ymd.slice(4,6),10);
+  const expiryDate=new Date(2000+yy, mm-1, dd, 23,59,59);
+  return expiryDate.getTime();
+}
 function checkActiv(){
   const input=(document.getElementById('activInput').value||'').trim().toUpperCase();
   const msg=document.getElementById('activMsg');
-  /* كود خاص بالمختبرين (Closed Testing) — صالح لغاية تاريخ ثابت بغض النظر عن تاريخ الاستخدام */
-  const TESTER_CODE='RMYTEST26';
-  const TESTER_EXPIRY=new Date('2026-09-15T23:59:59').getTime();
-  if(input===TESTER_CODE){
-    if(Date.now()>TESTER_EXPIRY){
+  const groupExpiry=checkGroupCode(input);
+  if(groupExpiry!==null){
+    if(Date.now()>groupExpiry){
       if(msg){msg.style.color='var(--coral)';msg.textContent='❌ انتهت صلاحية كود الاختبار';}
       return;
     }
     localStorage.setItem('rmy_premium','true');
-    localStorage.setItem('rmy_expiry',TESTER_EXPIRY.toString());
+    localStorage.setItem('rmy_expiry',groupExpiry.toString());
     isPremium=true;
     closeActiv();buildHome();
-    const expiryStr=new Date(TESTER_EXPIRY).toLocaleDateString('ar-EG');
+    const expiryStr=new Date(groupExpiry).toLocaleDateString('ar-EG');
     setTimeout(()=>showToast('🎉 تم تفعيل نسخة الاختبار! صالحة حتى: '+expiryStr),200);
     return;
   }
